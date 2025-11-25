@@ -17,6 +17,18 @@
     <packaging>jar</packaging>
 
     <dependencies>
+<!--        Pojo模块-->
+        <dependency>
+            <groupId>com.weblab</groupId>
+            <artifactId>Pojo</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+<!--        Common模块-->
+        <dependency>
+            <groupId>com.weblab</groupId>
+            <artifactId>Common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>

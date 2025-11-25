@@ -1,5 +1,6 @@
 package com.weblab.common.core.domain;
 
+import com.weblab.common.constant.HttpStatus;
 import lombok.AllArgsConstructor;
 
 /**
@@ -19,15 +20,15 @@ public class ApiResult<T> {
     }
 
     public static <T> ApiResult<T> restApiResult(Integer code, String message, T data){
-        return new ApiResult<>(code, message, data);
+        return new ApiResult<T>(code, message, data);
     }
 
     // 成功
     public static <T> ApiResult<T> success(T data){
-        return restApiResult(200, "success", data);
+        return restApiResult(HttpStatus.SUCCESS, "success", data);
     }
     public static <T> ApiResult<T> success(String message, T data){
-        return restApiResult(200, message, data);
+        return restApiResult(HttpStatus.SUCCESS, message, data);
     }
     // 失败
     public static <T> ApiResult<T> fail(Integer code, String message){
@@ -35,6 +36,6 @@ public class ApiResult<T> {
     }
 
     public static <T> ApiResult<T> fail(String message){
-        return restApiResult(500, message, null);
+        return restApiResult(HttpStatus.SUCCESS, message, null);
     }
 }
