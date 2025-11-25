@@ -1,6 +1,19 @@
 spring:
     application:
         name: Server
+    datasource:
+        url: jdbc:postgresql://${weblabedb.postgres.host}:${weblabedb.postgres.port}/${weblabedb.postgres.db}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+        username: ${weblabedb.postgres.username}
+        password: ${weblabedb.postgres.password}
+        driver-class-name: org.postgresql.Driver
 server:
     port: 8080
+
+weblabedb:
+    postgres:
+        host: 124.221.95.132
+        port: 5432
+        db: webappdb
+        username: webuser
+        password: web_experiment
 
