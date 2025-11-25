@@ -30,7 +30,7 @@
         <!-- MyBatis ORM框架 -->
         <mybatis.version>3.5.13</mybatis.version>
         <mybatis-plus-boot-starter.version>3.5.3.1</mybatis-plus-boot-starter.version>
-        <mysql-connector.version>8.0.33</mysql-connector.version>
+        <postgres.version>42.5.4</postgres.version>
     </properties>
 
     <dependencyManagement>
@@ -47,10 +47,11 @@
                 <version>${hutool.version}</version>
             </dependency>
 
+            <!-- PostgreSQL 驱动 -->
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql-connector.version}</version>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgres.version}</version>
             </dependency>
 
             <!-- MyBatis ORM框架 -->
