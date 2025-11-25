@@ -1,12 +1,10 @@
 package com.weblab.server.dao;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.weblab.server.entity.User;
-import com.weblab.server.mapper.UserMapper;
+import com.weblab.server.entity.Teacher;
+import com.weblab.server.mapper.TeacherMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDao extends ServiceImpl<UserMapper, User> {
-
-
+public class TeacherDao extends ServiceImpl<TeacherMapper, Teacher> {
 }

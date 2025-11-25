@@ -17,3 +17,8 @@ weblabedb:
         username: webuser
         password: web_experiment
 
+mybatis-plus:
+    configuration:
+        # 映射驼峰（实体属性名）到下划线（列名）
+        map-underscore-to-camel-case: true
+
