@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.weblab.common.core.domain.ApiResult.success;
+/**
+ * 用户控制层
+ */
 
 @RestController
 @RequestMapping("/user/")
@@ -19,11 +21,12 @@ public class UserController {
 
     /**
      * 根据用户id 查找 用户
+     *
      * @param id
      * @return
      */
     @RequestMapping("get/{id}")
-    public ApiResult<User> getById(@PathVariable Long id){
+    public ApiResult<User> getById(@PathVariable Long id) {
         return ApiResult.success(userService.getById(id));
     }
 
