@@ -1,4 +1,4 @@
-package com.weblab.admin.service;
+package com.weblab.server.service;
 
 import com.weblab.server.vo.CourseVO;
 

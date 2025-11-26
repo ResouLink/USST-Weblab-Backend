@@ -1,11 +1,10 @@
-package com.weblab.admin.controller;
+package com.weblab.server.controller.admin;
 
 
-import com.weblab.admin.service.CourseService;
 import com.weblab.common.core.domain.ApiResult;
+import com.weblab.server.service.CourseService;
 import com.weblab.server.vo.CourseVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

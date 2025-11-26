@@ -1,10 +1,9 @@
-package com.weblab.admin.service.impl;
+package com.weblab.server.service.impl;
 
 import com.weblab.server.dao.CourseDao;
 import com.weblab.server.dao.TeacherCourseDao;
-import com.weblab.admin.service.CourseService;
+import com.weblab.server.service.CourseService;
 import com.weblab.server.vo.CourseVO;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
