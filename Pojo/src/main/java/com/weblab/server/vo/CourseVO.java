@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 @Data
@@ -37,7 +38,7 @@ public class CourseVO implements Serializable {
     /**
      * 授课老师数组
      */
-    private CourseTeacherVO[] teachers;
+    private List<CourseTeacherVO> teachers;
     /**
      * 修改时间
      */

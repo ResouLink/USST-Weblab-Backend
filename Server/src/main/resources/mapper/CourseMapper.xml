@@ -3,11 +3,54 @@
 <mapper namespace="com.weblab.server.mapper.CourseMapper">
 
     <!-- 基础 ResultMap 映射 -->
-<!--    <select id="getById" resultMap="CourseVoResult">-->
-<!--        SELECT c.*, t.*-->
-<!--        FROM course c-->
-<!--        LEFT JOIN teacher_course tc ON c.id = tc.course_id-->
-<!--        LEFT JOIN teacher t ON tc.teacher_id = t.id-->
-<!--        WHERE id = #{id}-->
-<!--    </select>-->
+
+    <resultMap id="CourseTeacherVOResult" type="com.weblab.server.vo.CourseTeacherVO">
+        <id column="id" property="teacherId"/>
+        <result column="name" property="teacherName"/>
+    </resultMap>
+
+    <resultMap id="CourseVoResult" type="com.weblab.server.vo.CourseVO">
+        <id column="id" property="id"/>
+        <result column="cname" property="name"/>
+        <result column="description" property="description"/>
+        <result column="collage" property="college"/>
+        <result column="create_at" property="createAt"/>
+        <result column="update_at" property="updateAt"/>
+        <collection property="teachers" ofType="com.weblab.server.vo.CourseTeacherVO"
+                    resultMap="CourseTeacherVOResult"/>
+    </resultMap>
+
+    <select id="getById" resultMap="CourseVoResult">
+        SELECT
+            c.id,
+            c.cname,
+            c.description,
+            c.collage,
+            c.create_at,
+            c.update_at,
+            t.id as id,
+            t.name as name
+        FROM course c
+                 LEFT JOIN teacher_course tc ON c.id = tc.course_id
+                 LEFT JOIN teacher t ON tc.teacher_id = t.id
+        WHERE c.id = #{id}
+    </select>
+
+
+    <select id="list" resultMap="CourseVoResult">
+        SELECT
+            c.id,
+            c.cname,
+            c.description,
+            c.collage,
+            c.create_at,
+            c.update_at,
+            t.id as id,
+            t.name as name
+        FROM course c
+                 LEFT JOIN teacher_course tc ON c.id = tc.course_id
+                 LEFT JOIN teacher t ON tc.teacher_id = t.id
+            LIMIT #{page}, #{size};
+    </select>
+
 </mapper>
