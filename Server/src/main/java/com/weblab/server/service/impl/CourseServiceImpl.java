@@ -1,7 +1,6 @@
 package com.weblab.server.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import com.weblab.common.exception.ServiceException;
 import com.weblab.server.dao.CourseDao;
 import com.weblab.server.dao.TeacherCourseDao;
@@ -15,7 +14,6 @@ import com.weblab.server.vo.CourseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -51,9 +49,6 @@ public class CourseServiceImpl implements CourseService {
         }
         Course course = new Course();
         BeanUtil.copyProperties(courseDTO, course); // 确保属性名一致
-        // 获得当前时间
-        course.setCreateAt(LocalDateTimeUtil.format(LocalDateTime.now(), "yyyy-MM-dd HH:mm:ss"));
-        course.setUpdateAt(LocalDateTimeUtil.format(LocalDateTime.now(), "yyyy-MM-dd HH:mm:ss"));
         if (courseDTO.getTeachersId().length == 0) {
             courseDao.save(course);
             return true;
@@ -102,7 +97,6 @@ public class CourseServiceImpl implements CourseService {
         }
         Course course = new Course();
         BeanUtil.copyProperties(courseDTO, course);
-        course.setUpdateAt(LocalDateTimeUtil.format(LocalDateTime.now(), "yyyy-MM-dd HH:mm:ss"));
         if (courseDTO.getTeachersId().length == 0) {
             courseDao.updateById(course);
             return true;

@@ -1,5 +1,7 @@
 package com.weblab.server.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,9 +53,11 @@ public class Resource implements Serializable {
     /**
      * 初次上传时间
      */
+    @TableField(fill = FieldFill.INSERT)
     private String createAt;
     /**
      * 修改时间
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateAt;
 }
