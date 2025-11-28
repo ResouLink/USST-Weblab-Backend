@@ -1,52 +1,48 @@
 package com.weblab.server.controller.admin;
 
-
 import com.weblab.common.core.domain.ApiResult;
 import com.weblab.server.dto.CourseDTO;
 import com.weblab.server.dto.PageDto;
 import com.weblab.server.service.CourseService;
+import com.weblab.server.service.QuestionService;
 import com.weblab.server.vo.CourseVO;
+import com.weblab.server.vo.QuestionVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 课程管理; todo 未做测试功能是否正确
- */
 @RestController
-@RequestMapping("/api/courses/")
-public class CourseController {
-
+@RequestMapping("/api/questions/")
+public class QuestionController {
     @Autowired
-    private CourseService courseService;
+    private QuestionService questionService;
 
     @GetMapping("{id}")
-    public ApiResult<CourseVO> getById(@PathVariable Long id) {
-        return ApiResult.success(courseService.getById(id));
+    public ApiResult<QuestionVO> getById(@PathVariable Long id) {
+        return ApiResult.success(questionService.getById(id));
     }
 
     @GetMapping({"list/{keyword}/{page}/{size}"})
-    public ApiResult<List<CourseVO>> list(@PathVariable String keyword,
+    public ApiResult<List<QuestionVO>> list(@PathVariable String keyword,
                                           @PathVariable long page,
                                           @PathVariable long size) {
         PageDto pageDto = new PageDto(keyword, page, size);
-        return ApiResult.success(courseService.list(pageDto));
+        return ApiResult.success(questionService.list(pageDto));
     }
 
     @PostMapping
     public ApiResult<Boolean> save(@RequestBody CourseDTO courseDTO) {
-        return ApiResult.success(courseService.save(courseDTO));
+        return ApiResult.success(questionService.save(courseDTO));
     }
 
     @DeleteMapping("{id}")
     public ApiResult<Boolean> delete(@PathVariable Long id) {
-        return ApiResult.success(courseService.delete(id));
+        return ApiResult.success(questionService.delete(id));
     }
 
     @PutMapping("{id}")
     public ApiResult<Boolean> update(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
-        return ApiResult.success(courseService.update(courseDTO));
+        return ApiResult.success(questionService.update(courseDTO));
     }
-
 }

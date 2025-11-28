@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CourseService {
     CourseVO getById(Long id);
-    Boolean insert(CourseDTO courseDTO);
+    Boolean save(CourseDTO courseDTO);
     Boolean delete(Long id);
     Boolean update(CourseDTO courseDTO);
     List<CourseVO> list(PageDto pageDto);

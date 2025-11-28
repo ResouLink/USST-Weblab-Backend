@@ -43,7 +43,7 @@ public class CourseServiceImpl implements CourseService {
      * @return
      */
     @Override
-    public Boolean insert(CourseDTO courseDTO) {
+    public Boolean save(CourseDTO courseDTO) {
         if (BeanUtil.isEmpty(courseDTO)) {
             throw new ServiceException("新增课程为空!");
         }

@@ -1,4 +1,4 @@
-package com.weblab.server.controller.user;
+package com.weblab.server.controller.front;
 
 import com.weblab.common.core.domain.ApiResult;
 import com.weblab.server.entity.User;
