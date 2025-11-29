@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-
+import java.util.List;
 
 
 @Data
@@ -21,7 +21,7 @@ public class AnswerVO implements Serializable {
     /**
      * 附件文件列表
      */
-    private String[] files;
+    private List<String> files;
     /**
      * 回答问题表主键
      */
