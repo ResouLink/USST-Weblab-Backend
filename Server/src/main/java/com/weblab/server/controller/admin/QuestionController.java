@@ -23,10 +23,10 @@ public class QuestionController {
         return ApiResult.success(questionService.getById(id));
     }
 
-    @GetMapping({"list/{keyword}/{page}/{size}"})
-    public ApiResult<List<QuestionVO>> list(@PathVariable String keyword,
-                                          @PathVariable long page,
-                                          @PathVariable long size) {
+    @GetMapping
+    public ApiResult<List<QuestionVO>> list(@RequestParam String keyword,
+                                            @RequestParam long page,
+                                            @RequestParam long size) {
         PageDto pageDto = new PageDto(keyword, page, size);
         return ApiResult.success(questionService.list(pageDto));
     }

@@ -26,10 +26,10 @@ public class CourseController {
         return ApiResult.success(courseService.getById(id));
     }
 
-    @GetMapping({"list/{keyword}/{page}/{size}"})
-    public ApiResult<List<CourseVO>> list(@PathVariable String keyword,
-                                          @PathVariable long page,
-                                          @PathVariable long size) {
+    @GetMapping
+    public ApiResult<List<CourseVO>> list(@RequestParam String keyword,
+                                          @RequestParam long page,
+                                          @RequestParam long size) {
         PageDto pageDto = new PageDto(keyword, page, size);
         return ApiResult.success(courseService.list(pageDto));
     }
