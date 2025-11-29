@@ -28,8 +28,7 @@
         <lombok.version>1.18.30</lombok.version>
         <hutool.version>5.8.20</hutool.version>
         <!-- MyBatis ORM框架 -->
-        <mybatis.version>3.5.13</mybatis.version>
-        <mybatis-plus-boot-starter.version>3.5.3.1</mybatis-plus-boot-starter.version>
+        <mybatis-plus-spring-boot3-starter.version>3.5.7</mybatis-plus-spring-boot3-starter.version>
         <postgres.version>42.5.4</postgres.version>
         <!-- 项目其他模块引用版本控制 -->
         <Common.version>0.0.1-SNAPSHOT</Common.version>
@@ -53,16 +52,14 @@
 
             <!-- PostgreSQL 驱动 -->
             <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus-spring-boot3-starter.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgres.version}</version>
-            </dependency>
-
-            <!-- MyBatis ORM框架 -->
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>${mybatis.version}</version>
             </dependency>
 
             <!-- 项目其他模块版本管理 -->
