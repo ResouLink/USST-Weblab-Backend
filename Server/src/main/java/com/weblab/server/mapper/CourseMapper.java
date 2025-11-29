@@ -5,7 +5,6 @@ import com.weblab.server.dto.PageDto;
 import com.weblab.server.entity.Course;
 import com.weblab.server.vo.CourseVO;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -13,5 +12,6 @@ import java.util.List;
 public interface CourseMapper extends BaseMapper<Course> {
 
     CourseVO getById(Long id);
+
     List<CourseVO> list(PageDto pageDto);
 }
