@@ -22,3 +22,9 @@ mybatis-plus:
         # 映射驼峰（实体属性名）到下划线（列名）
         map-underscore-to-camel-case: true
 
+alioss:
+  endpoint: oss-cn-shanghai.aliyuncs.com
+  access-key-id: 1
+  access-key-secret: 1
+  bucket-name: testbucket-3100157652
+
