@@ -2,13 +2,17 @@ package com.weblab.common.core.domain;
 
 import com.weblab.common.constant.HttpStatus;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 基础返回体
  * @param <T>
  */
+@Data
 @AllArgsConstructor
-public class ApiResult<T> {
+public class ApiResult<T> implements Serializable {
     // 状态码
     private Integer code;
     // 返回消息

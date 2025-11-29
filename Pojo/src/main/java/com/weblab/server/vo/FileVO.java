@@ -14,7 +14,7 @@ public class FileVO implements java.io.Serializable {
     /**
      * 文件id，对应附件表的主键
      */
-    private String fileId;
+    private long fileId;
     /**
      * 上传文件的名称，是原本上传文件的名称，不是oss内的名称
      */

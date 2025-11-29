@@ -26,7 +26,7 @@ mybatis-plus:
 
 alioss:
   endpoint: oss-cn-shanghai.aliyuncs.com
-  access-key-id: 1
-  access-key-secret: 1
+  access-key-id: LTAI5tAN9c1RzEn9tCh4amtj
+  access-key-secret: ovLOyOeYpEYJXzqjFdJZJpJyhz9x6e
   bucket-name: testbucket-3100157652
 

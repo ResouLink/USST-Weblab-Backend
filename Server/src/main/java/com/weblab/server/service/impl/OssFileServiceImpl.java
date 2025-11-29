@@ -5,6 +5,7 @@ import com.weblab.common.utils.AliOssUtil;
 import com.weblab.server.dao.FileDao;
 import com.weblab.server.entity.File;
 import com.weblab.server.service.OssFileService;
+import com.weblab.server.vo.FileVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,14 @@ public class OssFileServiceImpl implements OssFileService {
                     .fileType(extension)
                     .build();
             fileDao.save(fileInfo);
-            return ApiResult.success(fileInfo);
+            FileVO fileVO = FileVO.builder()
+                    .fileId(fileInfo.getId())
+                    .fileType(fileInfo.getFileType())
+                    .fileSize(fileInfo.getFileSize())
+                    .fileName(originalFilename)
+                    .build();
+
+            return ApiResult.success(fileVO);
 
         } catch (IOException e) {
             log.info("文件上传失败：{}",e);

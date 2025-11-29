@@ -20,7 +20,7 @@ public class File implements Serializable {
      * 附件表主键
      */
     @TableId(type = IdType.AUTO)
-    private long id;
+    private Long id;
     /**
      * 文件大小
      */
