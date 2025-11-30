@@ -1,7 +1,7 @@
 package com.weblab.server.service;
 
-import com.weblab.server.entity.User;
+import com.weblab.server.entity.Users;
 
 public interface UserService {
-    User getById(Long id);
+    Users getById(Long id);
 }

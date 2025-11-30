@@ -1,10 +1,9 @@
 package com.weblab.server.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.weblab.server.entity.User;
+import com.weblab.server.entity.Users;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Service;
 
 @Mapper
-public interface UserMapper extends BaseMapper<User> {
+public interface UserMapper extends BaseMapper<Users> {
 }

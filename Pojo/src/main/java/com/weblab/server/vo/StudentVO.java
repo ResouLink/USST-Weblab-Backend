@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -20,7 +21,7 @@ public class StudentVO implements Serializable {
     /**
      * 创建时间，注册账号后第一次保存个人资料
      */
-    private String createAt;
+    private LocalDateTime createAt;
     /**
      * 性别，0是男，1是女
      */
@@ -40,7 +41,7 @@ public class StudentVO implements Serializable {
     /**
      * 修改时间
      */
-    private String updateAt;
+    private LocalDateTime updateAt;
 }
 
 
