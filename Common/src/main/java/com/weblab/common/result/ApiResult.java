@@ -1,4 +1,4 @@
-package com.weblab.common.core.domain;
+package com.weblab.common.result;
 
 import com.weblab.common.constant.HttpStatus;
 import lombok.AllArgsConstructor;

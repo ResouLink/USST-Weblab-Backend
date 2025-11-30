@@ -1,6 +1,6 @@
 package com.weblab.server.service.impl;
 
-import com.weblab.common.core.domain.ApiResult;
+import com.weblab.common.result.ApiResult;
 import com.weblab.common.utils.AliOssUtil;
 import com.weblab.server.dao.FileDao;
 import com.weblab.server.entity.File;
@@ -8,7 +8,6 @@ import com.weblab.server.service.OssFileService;
 import com.weblab.server.vo.FileVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

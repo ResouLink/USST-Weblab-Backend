@@ -1,4 +1,4 @@
-package com.weblab.common.config;
+package com.weblab.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

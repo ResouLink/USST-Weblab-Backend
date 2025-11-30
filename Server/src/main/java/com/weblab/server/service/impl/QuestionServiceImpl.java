@@ -1,8 +1,7 @@
 package com.weblab.server.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import com.weblab.common.core.domain.FileRole;
+import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.common.exception.ServiceException;
 import com.weblab.server.dao.FileListDao;
 import com.weblab.server.dao.QuestionDao;
@@ -15,7 +14,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -34,7 +32,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (BeanUtil.isEmpty(question)){
             throw new ServiceException("question不存在");
         }
-        List<Long> fileIds = fileListDao.getFileIds(FileRole.QUESTION, id);
+        List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.QUESTION, id);
         QuestionVO questionVO = new QuestionVO();
         BeanUtils.copyProperties(question, questionVO);
         List<String> stringList = fileIds.stream().map(String::valueOf).toList();

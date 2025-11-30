@@ -1,11 +1,9 @@
 package com.weblab.server.controller;
 
 
-import com.weblab.common.core.domain.ApiResult;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.service.OssFileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

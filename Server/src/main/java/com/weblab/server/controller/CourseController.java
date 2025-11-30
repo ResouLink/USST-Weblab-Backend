@@ -1,7 +1,7 @@
-package com.weblab.server.controller.admin;
+package com.weblab.server.controller;
 
 
-import com.weblab.common.core.domain.ApiResult;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.CourseDTO;
 import com.weblab.server.dto.PageDto;
 import com.weblab.server.service.CourseService;

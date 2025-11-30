@@ -1,7 +1,7 @@
 package com.weblab.server.controller;
 
 
-import com.weblab.common.core.domain.ApiResult;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.StudentDTO;
 import com.weblab.server.service.StudentService;
 import lombok.RequiredArgsConstructor;

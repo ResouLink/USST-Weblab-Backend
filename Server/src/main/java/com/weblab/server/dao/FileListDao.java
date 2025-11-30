@@ -1,7 +1,7 @@
 package com.weblab.server.dao;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.weblab.common.core.domain.FileRole;
+import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.server.entity.FileList;
 import com.weblab.server.mapper.FileListMapper;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class FileListDao extends ServiceImpl<FileListMapper, FileList> {
      * @param nodeId 节点id
      * @return
      */
-    public List<Long> getFileIds(FileRole fileRole, Long nodeId) {
+    public List<Long> getFileIds(FileRoleEnum fileRole, Long nodeId) {
         return baseMapper.getFileIds(fileRole, nodeId);
     }
 }

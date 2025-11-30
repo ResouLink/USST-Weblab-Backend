@@ -5,7 +5,7 @@ package com.weblab.server;
 import com.weblab.server.dao.StudentDao;
 import com.weblab.server.dto.StudentDTO;
 import com.weblab.server.entity.Student;
-import com.weblab.common.core.domain.ApiResult;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.service.impl.StudentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

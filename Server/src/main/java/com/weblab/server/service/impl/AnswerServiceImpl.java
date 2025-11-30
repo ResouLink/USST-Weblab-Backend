@@ -1,7 +1,7 @@
 package com.weblab.server.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.weblab.common.core.domain.FileRole;
+import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.common.exception.ServiceException;
 import com.weblab.server.dao.AnswerDao;
 import com.weblab.server.dao.FileListDao;
@@ -31,7 +31,7 @@ public class AnswerServiceImpl implements AnswerService {
         if (BeanUtil.isEmpty(answer)){
             throw new ServiceException("answer不存在");
         }
-        List<Long> fileIds = fileListDao.getFileIds(FileRole.ANSWER, id);
+        List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.ANSWER, id);
         List<String> stringList = fileIds.stream().map(String::valueOf).toList();
         AnswerVO answerVO = new AnswerVO();
         BeanUtil.copyProperties(answer, answerVO);

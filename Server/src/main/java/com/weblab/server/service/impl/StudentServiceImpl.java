@@ -2,7 +2,7 @@ package com.weblab.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.weblab.common.core.domain.ApiResult;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.dao.StudentDao;
 import com.weblab.server.dto.StudentDTO;
 import com.weblab.server.entity.Student;

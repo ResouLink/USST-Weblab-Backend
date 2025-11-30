@@ -1,7 +1,7 @@
 package com.weblab.server.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.weblab.common.core.domain.FileRole;
+import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.server.entity.FileList;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,5 +15,5 @@ public interface FileListMapper extends BaseMapper<FileList> {
      * @param nodeId 节点id
      * @return
      */
-    List<Long> getFileIds(FileRole fileRole, Long nodeId);
+    List<Long> getFileIds(FileRoleEnum fileRole, Long nodeId);
 }

@@ -1,12 +1,10 @@
-package com.weblab.server.controller.admin;
+package com.weblab.server.controller;
 
-import com.weblab.common.core.domain.ApiResult;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.CourseDTO;
 import com.weblab.server.dto.PageDto;
 import com.weblab.server.service.AnswerService;
-import com.weblab.server.service.CourseService;
 import com.weblab.server.vo.AnswerVO;
-import com.weblab.server.vo.CourseVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

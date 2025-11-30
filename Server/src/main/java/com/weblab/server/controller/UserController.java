@@ -1,6 +1,6 @@
-package com.weblab.server.controller.front;
+package com.weblab.server.controller;
 
-import com.weblab.common.core.domain.ApiResult;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.entity.Users;
 import com.weblab.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
