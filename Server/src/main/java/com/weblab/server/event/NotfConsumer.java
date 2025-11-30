@@ -1,22 +1,23 @@
 package com.weblab.server.event;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.weblab.common.utils.UserHolder;
 import com.weblab.server.entity.Notification;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
 
+@Slf4j
 @Component
 public class NotfConsumer implements Runnable {
     @Autowired
     @Qualifier("notificationExecutor")
     private ExecutorService notificationExecutor;
-    @Autowired
-    private SseClient sseClient;
-
     @PostConstruct
     public void init(){
         notificationExecutor.submit(this);
@@ -34,8 +35,13 @@ public class NotfConsumer implements Runnable {
                 if (consumeNotification == null) {
                     continue;
                 }
-                // todo 发送通知
-
+                String content = JSONUtil.toJsonStr(consumeNotification);
+                String loginUser = UserHolder.getLoginUser();
+                Boolean isSend = SseClient.sendMessage(loginUser, content);
+                if (!isSend) {
+                    log.info("消息推送失败，将消息重新放入队列重试！");
+                    NotificationQueue.putNotification(consumeNotification);
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;

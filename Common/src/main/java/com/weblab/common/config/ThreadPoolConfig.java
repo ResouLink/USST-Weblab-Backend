@@ -11,7 +11,7 @@ public class ThreadPoolConfig {
 
     private static final String NOTIFICATION_EXECUTOR = "notificationExecutor"; // 通知线程池
 
-    @Bean(name = NOTIFICATION_EXECUTOR)
+    @Bean(NOTIFICATION_EXECUTOR)
     public ExecutorService notificationExecutor() {
         return Executors.newSingleThreadExecutor(); // 后续可以改
     }

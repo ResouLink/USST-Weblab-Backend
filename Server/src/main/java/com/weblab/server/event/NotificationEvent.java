@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 
-@Getter
+
 public class NotificationEvent extends ApplicationEvent {
     private Long notificationId; // 通知id
 
@@ -18,5 +18,9 @@ public class NotificationEvent extends ApplicationEvent {
     public NotificationEvent(Object source, Clock clock, Long notificationId) {
         super(source, clock);
         this.notificationId = notificationId;
+    }
+
+    public Long getNotificationId() {
+        return notificationId;
     }
 }

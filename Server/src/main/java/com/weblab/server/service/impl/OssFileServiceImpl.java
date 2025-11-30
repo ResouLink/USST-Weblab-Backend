@@ -8,6 +8,7 @@ import com.weblab.server.service.OssFileService;
 import com.weblab.server.vo.FileVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class OssFileServiceImpl implements OssFileService {
+
     private final FileDao fileDao;
     private final AliOssUtil aliOssUtil;
 
