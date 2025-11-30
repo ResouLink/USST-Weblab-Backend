@@ -11,16 +11,16 @@ import java.time.format.DateTimeFormatter;
 public class FillHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
-        this.strictInsertFill(metaObject, "createAt", String.class, getCurrentTime());
-        this.strictInsertFill(metaObject, "updateAt", String.class, getCurrentTime());
+        this.strictInsertFill(metaObject, "createAt", LocalDateTime.class, getCurrentTime());
+        this.strictInsertFill(metaObject, "updateAt", LocalDateTime.class, getCurrentTime());
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        this.strictUpdateFill(metaObject, "updateAt", String.class, getCurrentTime());
+        this.strictUpdateFill(metaObject, "updateAt", LocalDateTime.class, getCurrentTime());
     }
 
-    private String getCurrentTime() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    private LocalDateTime getCurrentTime() {
+        return LocalDateTime.now();
     }
 }

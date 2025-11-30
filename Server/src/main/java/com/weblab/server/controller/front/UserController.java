@@ -1,7 +1,7 @@
 package com.weblab.server.controller.front;
 
 import com.weblab.common.core.domain.ApiResult;
-import com.weblab.server.entity.User;
+import com.weblab.server.entity.Users;
 import com.weblab.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +26,7 @@ public class UserController {
      * @return
      */
     @RequestMapping("get/{id}")
-    public ApiResult<User> getById(@PathVariable Long id) {
+    public ApiResult<Users> getById(@PathVariable Long id) {
         return ApiResult.success(userService.getById(id));
     }
 

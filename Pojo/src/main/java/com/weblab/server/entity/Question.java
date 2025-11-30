@@ -1,5 +1,7 @@
 package com.weblab.server.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +19,8 @@ public class Question implements Serializable {
     /**
      * 问题表主键
      */
-    private long id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
     /**
      * 提问内容
      */

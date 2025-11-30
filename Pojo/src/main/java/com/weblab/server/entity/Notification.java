@@ -1,5 +1,7 @@
 package com.weblab.server.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +19,8 @@ public class Notification implements Serializable {
     /**
     * 通知表主键
     */
-    private long id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
     /**
      * 通知内容
      */

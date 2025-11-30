@@ -1,5 +1,7 @@
 package com.weblab.server.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,11 +15,12 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable {
+public class Users implements Serializable {
     /**
      * 用户表主键
      */
-    private long id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
     /**
      * 邮箱地址
      */

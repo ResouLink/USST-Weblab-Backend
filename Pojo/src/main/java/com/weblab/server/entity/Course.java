@@ -1,15 +1,16 @@
 package com.weblab.server.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-
-
+import java.time.LocalDateTime;
 
 
 @Data
@@ -25,7 +26,7 @@ public class Course implements Serializable {
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
-    private String createAt;
+    private LocalDateTime createAt;
     /**
      * 课程描述
      */
@@ -33,7 +34,8 @@ public class Course implements Serializable {
     /**
      * 课程表主键
      */
-    private long id;
+    @TableId(type = IdType.AUTO)
+    private Long id;
     /**
      * 课程名称
      */
@@ -42,5 +44,5 @@ public class Course implements Serializable {
      * 修改时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateAt;
+    private LocalDateTime updateAt;
 }
