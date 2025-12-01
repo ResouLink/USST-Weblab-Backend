@@ -1,5 +1,6 @@
 package com.weblab.server.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.result.ApiResult;
@@ -8,6 +9,7 @@ import com.weblab.server.dao.TeacherCourseDao;
 import com.weblab.server.dao.TeacherDao;
 import com.weblab.server.dto.CourseDTO;
 import com.weblab.server.entity.Course;
+import com.weblab.server.entity.Teacher;
 import com.weblab.server.entity.TeacherCourse;
 import com.weblab.server.service.CourseService;
 import com.weblab.server.vo.CourseVO;
@@ -36,7 +38,7 @@ public class CourseServiceImpl implements CourseService {
         courseDao.save(newCourse);
         
         // 添加教师关系
-        if (courseDTO.getTeachersId() != null && courseDTO.getTeachersId().length > 0) {
+        if (courseDTO.getTeachersId() != null && !courseDTO.getTeachersId().isEmpty()) {
             for (Long teacherId : courseDTO.getTeachersId()) {
                 if (teacherDao.getById(teacherId) == null) {
                     log.warn("教师不存在, ID: {}", teacherId);
@@ -65,20 +67,24 @@ public class CourseServiceImpl implements CourseService {
 
         boolean updated = courseDao.updateById(existing);
         if (updated) {
-            // 更新教师关系
-            if (courseDTO.getTeachersId() != null && courseDTO.getTeachersId().length > 0) {
-                teacherCourseDao.remove(new QueryWrapper<TeacherCourse>().eq("course_id", id));
-                for (Long teacherId : courseDTO.getTeachersId()) {
-                    if (teacherDao.getById(teacherId) == null) {
+            // 先删除所有旧的教师关系
+            teacherCourseDao.remove(new QueryWrapper<TeacherCourse>().eq("course_id", id));
+
+            // 再插入新的教师关系（如果 teachersId 不为空）
+            if (courseDTO.getTeachersId() != null && !courseDTO.getTeachersId().isEmpty()) {
+                // 校验教师是否存在
+                List<Long> teacherIds = courseDTO.getTeachersId();
+                List<Long> existTeacherIds = teacherDao.listObjs(new QueryWrapper<Teacher>().in("id", teacherIds))
+                        .stream().map(o -> (Long) o).toList();
+                for (Long teacherId : teacherIds) {
+                    if (!existTeacherIds.contains(teacherId)) {
                         log.warn("教师不存在, ID: {}", teacherId);
                         return ApiResult.fail(1, "教师ID不存在: " + teacherId);
                     }
-                    TeacherCourse teacherCourse = new TeacherCourse();
-                    teacherCourse.setCourseId(id);
-                    teacherCourse.setTeacherId(teacherId);
-                    teacherCourseDao.save(teacherCourse);
+                    teacherCourseDao.save(new TeacherCourse(id, teacherId));
                 }
             }
+
             log.info("课程更新成功");
             return ApiResult.success("课程更新成功", 1);
         } else {
@@ -109,6 +115,19 @@ public class CourseServiceImpl implements CourseService {
         }
         CourseVO vo = new CourseVO();
         BeanUtils.copyProperties(course, vo);
+        // 查询教师列表
+        List<Long> teacherIds = teacherCourseDao.listObjs(
+                new LambdaQueryWrapper<TeacherCourse>().eq(TeacherCourse::getCourseId, course.getId()).select(TeacherCourse::getTeacherId),
+                obj -> (Long) obj
+        );
+        vo.setTeachers(teacherIds);
+
+        // 需要教师姓名
+        List<String> teacherNames = teacherDao.listObjs(
+                new LambdaQueryWrapper<Teacher>().in(Teacher::getId, teacherIds).select(Teacher::getName),
+                obj -> (String) obj
+        );
+        vo.setTeachersName(teacherNames);
         return ApiResult.success(vo);
     }
 
@@ -126,6 +145,22 @@ public class CourseServiceImpl implements CourseService {
         List<CourseVO> voList = resultPage.getRecords().stream().map(course -> {
             CourseVO vo = new CourseVO();
             BeanUtils.copyProperties(course, vo);
+
+            // 查询教师列表
+            List<Long> teacherIds = teacherCourseDao.listObjs(
+                    new LambdaQueryWrapper<TeacherCourse>().eq(TeacherCourse::getCourseId, course.getId()).select(TeacherCourse::getTeacherId),
+                    obj -> (Long) obj
+            );
+            vo.setTeachers(teacherIds);
+
+            // 需要教师姓名
+            List<String> teacherNames = teacherDao.listObjs(
+                    new LambdaQueryWrapper<Teacher>().in(Teacher::getId, teacherIds).select(Teacher::getName),
+                    obj -> (String) obj
+            );
+            vo.setTeachersName(teacherNames);
+
+
             return vo;
         }).collect(Collectors.toList());
         

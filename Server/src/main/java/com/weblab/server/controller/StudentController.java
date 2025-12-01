@@ -42,4 +42,21 @@ public class StudentController {
     public ApiResult getStudents(@RequestParam long page,@RequestParam long size,@RequestParam String keyword) {
         return  studentService.getStudents(page,size,keyword);
     }
+
+    @PostMapping("/{student_id}/courses/{course_id}")
+    public ApiResult addStudentCourse(@PathVariable("student_id") long studentId,@PathVariable("course_id") long courseId) {
+        studentService.addStudentCourse(studentId,courseId);
+        return ApiResult.success(1);
+    }
+
+    @DeleteMapping("/{student_id}/courses/{course_id}")
+    public ApiResult deleteStudentCourse(@PathVariable("student_id") long studentId, @PathVariable("course_id") long courseId) {
+        studentService.deleteStudentCourse(studentId,courseId);
+        return ApiResult.success(1);
+    }
+
+    @GetMapping("/{id}/courses")
+    public ApiResult getStudentCourses(@PathVariable("id") long studentId) {
+        return ApiResult.success(studentService.getStudentCourses(studentId));
+    }
 }

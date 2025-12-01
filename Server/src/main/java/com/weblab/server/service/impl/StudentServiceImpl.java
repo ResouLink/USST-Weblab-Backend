@@ -1,11 +1,15 @@
 package com.weblab.server.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.result.ApiResult;
+import com.weblab.server.dao.StudentCourseDao;
 import com.weblab.server.dao.StudentDao;
 import com.weblab.server.dto.StudentDTO;
 import com.weblab.server.entity.Student;
+import com.weblab.server.entity.StudentCourse;
+import com.weblab.server.mapper.StudentCourseMapper;
 import com.weblab.server.service.StudentService;
 import com.weblab.server.vo.StudentVO;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
     private final StudentDao studentDao;
+    private final StudentCourseDao studentCourseDao;
 
     @Override
     public ApiResult addStudent(StudentDTO studentDTO) {
@@ -97,5 +102,24 @@ public class StudentServiceImpl implements StudentService {
         }).collect(Collectors.toList());
         // 5. 返回 ApiResult
         return ApiResult.success(voList);
+    }
+
+    @Override
+    public void addStudentCourse(long studentId, long courseId) {
+        studentCourseDao.save(StudentCourse.builder().studentId(studentId).courseId(courseId).build());
+    }
+
+    @Override
+    public void deleteStudentCourse(long studentId, long courseId) {
+        studentCourseDao.remove(new LambdaQueryWrapper<StudentCourse>()
+                .eq(StudentCourse::getStudentId, studentId)
+                .eq(StudentCourse::getCourseId, courseId));
+    }
+
+    @Override
+    public List<Long> getStudentCourses(long studentId) {
+        LambdaQueryWrapper<StudentCourse> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StudentCourse::getStudentId, studentId).select(StudentCourse::getCourseId);
+        return studentCourseDao.listObjs(queryWrapper,obj -> (Long) obj);
     }
 }

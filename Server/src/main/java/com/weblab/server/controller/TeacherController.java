@@ -38,4 +38,31 @@ public class TeacherController {
         return teacherService.getTeachers(page, size, keyword);
     }
 
+    @PostMapping("/{teacher_id}/courses/{course_id}")
+    public ApiResult addTeacherCourse(@PathVariable("teacher_id") long teacherId,@PathVariable("course_id") long courseId) {
+        try {
+            teacherService.addTeacherCourse(teacherId, courseId);
+            return ApiResult.success(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ApiResult.fail("添加失败");
+    }
+
+    @DeleteMapping("/{teacher_id}/courses/{courses_id}")
+    public ApiResult deleteTeacherCourse(@PathVariable("teacher_id") long teacherId, @PathVariable("courses_id") long courseId)  {
+        try {
+            teacherService.deleteTeacherCourse(teacherId, courseId);
+            return ApiResult.success(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ApiResult.fail("删除失败");
+    }
+
+    @GetMapping("/{id}/courses")
+    public ApiResult getTeacherCourses(@PathVariable("id") long teacherId) {
+        return ApiResult.success(teacherService.getTeacherCourses(teacherId));
+    }
+
 }

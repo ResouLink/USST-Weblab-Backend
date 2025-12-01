@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -22,7 +23,7 @@ public class CourseVO implements Serializable {
     /**
      * 创建时间
      */
-    private String createAt;
+    private LocalDateTime createAt;
     /**
      * 课程描述
      */
@@ -38,10 +39,12 @@ public class CourseVO implements Serializable {
     /**
      * 授课老师数组
      */
-    private List<CourseTeacherVO> teachers;
+    private List<Long> teachers;
     /**
      * 修改时间
      */
-    private String updateAt;
+    private LocalDateTime updateAt;
+
+    private List<String> teachersName;
 }
 
