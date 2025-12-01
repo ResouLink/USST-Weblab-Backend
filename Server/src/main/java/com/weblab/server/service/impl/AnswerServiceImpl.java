@@ -38,6 +38,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public ApiResult updateAnswer(AnswerDTO answerDTO, long id) {
+        // 检查是否涉及联表更新
         Answer existing = answerDao.getById(id);
         if (existing == null) {
             log.warn("答案不存在");
@@ -59,6 +60,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public ApiResult deleteAnswer(long id) {
+        // 删除答案有问题，要判断是否涉及联表删除
         boolean removed = answerDao.removeById(id);
         if (removed) {
             log.info("答案删除成功");

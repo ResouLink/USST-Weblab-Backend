@@ -30,6 +30,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public ApiResult updateResource(ResourceDTO resourceDTO, long id) {
+        // 更新有问题
         Resource existing = resourceDao.getById(id);
         if (existing == null) {
             log.warn("资源不存在");
@@ -51,6 +52,7 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public ApiResult deleteResource(long id) {
+        // 有问题
         boolean removed = resourceDao.removeById(id);
         if (removed) {
             log.info("资源删除成功");
