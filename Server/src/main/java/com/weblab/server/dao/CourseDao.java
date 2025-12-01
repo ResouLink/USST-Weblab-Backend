@@ -11,11 +11,4 @@ import java.util.List;
 
 @Service
 public class CourseDao extends ServiceImpl<CourseMapper, Course> {
-    public CourseVO getById(Long id) {
-        return getBaseMapper().getById(id);
-    }
-
-    public List<CourseVO> list(PageDto pageDto) {
-        return getBaseMapper().list(pageDto);
-    }
 }

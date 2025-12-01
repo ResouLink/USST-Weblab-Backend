@@ -9,6 +9,7 @@ import com.weblab.server.vo.FileVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class OssFileServiceImpl implements OssFileService {
 
@@ -36,6 +38,7 @@ public class OssFileServiceImpl implements OssFileService {
                     .fileType(extension)
                     .build();
             fileDao.save(fileInfo);
+            
             FileVO fileVO = FileVO.builder()
                     .fileId(fileInfo.getId())
                     .fileType(fileInfo.getFileType())
@@ -43,25 +46,33 @@ public class OssFileServiceImpl implements OssFileService {
                     .fileName(originalFilename)
                     .build();
 
+            log.info("文件上传成功, 文件ID: {}", fileInfo.getId());
             return ApiResult.success(fileVO);
 
         } catch (IOException e) {
-            log.info("文件上传失败：{}",e);
+            log.error("文件上传失败", e);
+            return ApiResult.fail("文件上传失败: " + e.getMessage());
         }
-
-        return ApiResult.fail("文件上传失败");
     }
 
     @Override
     public ApiResult deleteFile(long id) {
         File searchedFile = fileDao.getById(id);
-        if (searchedFile != null) {
+        if (searchedFile == null) {
+            log.warn("文件不存在, ID: {}", id);
+            return ApiResult.fail("文件不存在");
+        }
+
+        try {
             String[] parts = searchedFile.getFileUrl().split("/");
-            String filename = parts[parts.length - 1]; // file.txt
+            String filename = parts[parts.length - 1];
             aliOssUtil.delete(filename);
             fileDao.removeById(id);
+            log.info("文件删除成功, 文件ID: {}", id);
             return ApiResult.success("删除文件成功");
+        } catch (Exception e) {
+            log.error("文件删除失败", e);
+            return ApiResult.fail("删除文件失败: " + e.getMessage());
         }
-        return ApiResult.fail("删除文件失败");
     }
 }

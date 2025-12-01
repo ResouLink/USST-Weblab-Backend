@@ -1,34 +1,20 @@
 package com.weblab.server.controller;
 
 import com.weblab.common.result.ApiResult;
-import com.weblab.server.entity.Users;
 import com.weblab.server.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-/**
- * 用户控制层
- */
+import com.weblab.server.vo.UserVO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user/")
+@RequiredArgsConstructor
+@RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    /**
-     * 根据用户id 查找 用户
-     *
-     * @param id
-     * @return
-     */
-    @RequestMapping("get/{id}")
-    public ApiResult<Users> getById(@PathVariable Long id) {
-        return ApiResult.success(userService.getById(id));
+    @GetMapping("/{id}")
+    public ApiResult getUserById(@PathVariable long id) {
+        return userService.getUserById(id);
     }
-
-
 }

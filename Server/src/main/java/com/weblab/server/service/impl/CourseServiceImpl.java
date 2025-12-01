@@ -1,130 +1,134 @@
 package com.weblab.server.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.weblab.common.exception.ServiceException;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.dao.CourseDao;
 import com.weblab.server.dao.TeacherCourseDao;
 import com.weblab.server.dao.TeacherDao;
 import com.weblab.server.dto.CourseDTO;
-import com.weblab.server.dto.PageDto;
 import com.weblab.server.entity.Course;
 import com.weblab.server.entity.TeacherCourse;
 import com.weblab.server.service.CourseService;
 import com.weblab.server.vo.CourseVO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
-    @Autowired
-    private CourseDao courseDao;
-    @Autowired
-    private TeacherCourseDao teacherCourseDao;
-    @Autowired
-    private TeacherDao teacherDao;
+    private final CourseDao courseDao;
+    private final TeacherCourseDao teacherCourseDao;
+    private final TeacherDao teacherDao;
 
-    /**
-     * 通过id查找课程
-     *
-     * @param id
-     * @return
-     */
     @Override
-    public CourseVO getById(Long id) {
-        return courseDao.getById(id);
-    }
-
-    /**
-     * 新增课程
-     *
-     * @param courseDTO
-     * @return
-     */
-    @Override
-    public Boolean save(CourseDTO courseDTO) {
-        if (BeanUtil.isEmpty(courseDTO)) {
-            throw new ServiceException("新增课程为空!");
-        }
-        Course course = new Course();
-        BeanUtil.copyProperties(courseDTO, course); // 确保属性名一致
-        if (courseDTO.getTeachersId().length == 0) {
-            courseDao.save(course);
-            return true;
-        }
-        // 检查老师id是否存在
-        long[] teachersId = courseDTO.getTeachersId();
-        for (Long teacherId : teachersId) {
-            // 检查教师是否存在
-            if (teacherDao.getById(teacherId) == null) {
-                // 可以选择抛出异常或记录日志
-                throw new ServiceException("教师ID不存在: " + teacherId);
+    public ApiResult addCourse(CourseDTO courseDTO) {
+        Course newCourse = new Course();
+        BeanUtils.copyProperties(courseDTO, newCourse);
+        courseDao.save(newCourse);
+        
+        // 添加教师关系
+        if (courseDTO.getTeachersId() != null && courseDTO.getTeachersId().length > 0) {
+            for (Long teacherId : courseDTO.getTeachersId()) {
+                if (teacherDao.getById(teacherId) == null) {
+                    log.warn("教师不存在, ID: {}", teacherId);
+                    return ApiResult.fail(1, "教师ID不存在: " + teacherId);
+                }
+                TeacherCourse teacherCourse = new TeacherCourse();
+                teacherCourse.setCourseId(newCourse.getId());
+                teacherCourse.setTeacherId(teacherId);
+                teacherCourseDao.save(teacherCourse);
             }
         }
-        for (Long teacherId : teachersId) {
-            TeacherCourse teacherCourse = TeacherCourse.builder().courseId(course.getId()).teacherId(teacherId).build();
-            teacherCourseDao.save(teacherCourse);
-        }
-        return true;
+        log.info("课程添加成功");
+        return ApiResult.success("添加课程成功");
     }
 
-    /**
-     * 删除课程
-     *
-     * @param id
-     * @return
-     */
     @Override
-    public Boolean delete(Long id) {
-        if (BeanUtil.isEmpty(id)) {
-            throw new ServiceException("删除id为空!");
+    public ApiResult updateCourse(CourseDTO courseDTO, long id) {
+        Course existing = courseDao.getById(id);
+        if (existing == null) {
+            log.warn("课程不存在");
+            return ApiResult.fail(1, "课程不存在");
         }
-        courseDao.removeById(id);
-        return false;
-    }
 
-    /**
-     * 修改课程
-     *
-     * @param courseDTO
-     * @return
-     */
-    @Override
-    public Boolean update(CourseDTO courseDTO) {
-        if (BeanUtil.isEmpty(courseDTO)) {
-            throw new ServiceException("修改课程内容为空!");
-        }
-        Course course = new Course();
-        BeanUtil.copyProperties(courseDTO, course);
-        if (courseDTO.getTeachersId().length == 0) {
-            courseDao.updateById(course);
-            return true;
-        }
-        // 检查老师id是否存在
-        long[] teachersId = courseDTO.getTeachersId();
-        for (Long teacherId : teachersId) {
-            // 检查教师是否存在
-            if (teacherDao.getById(teacherId) == null) {
-                // 可以选择抛出异常或记录日志
-                throw new ServiceException("教师ID不存在: " + teacherId);
+        BeanUtils.copyProperties(courseDTO, existing);
+        existing.setId(id);
+
+        boolean updated = courseDao.updateById(existing);
+        if (updated) {
+            // 更新教师关系
+            if (courseDTO.getTeachersId() != null && courseDTO.getTeachersId().length > 0) {
+                teacherCourseDao.remove(new QueryWrapper<TeacherCourse>().eq("course_id", id));
+                for (Long teacherId : courseDTO.getTeachersId()) {
+                    if (teacherDao.getById(teacherId) == null) {
+                        log.warn("教师不存在, ID: {}", teacherId);
+                        return ApiResult.fail(1, "教师ID不存在: " + teacherId);
+                    }
+                    TeacherCourse teacherCourse = new TeacherCourse();
+                    teacherCourse.setCourseId(id);
+                    teacherCourse.setTeacherId(teacherId);
+                    teacherCourseDao.save(teacherCourse);
+                }
             }
+            log.info("课程更新成功");
+            return ApiResult.success("课程更新成功", 1);
+        } else {
+            log.warn("课程更新失败");
+            return ApiResult.fail(1, "更新失败");
         }
-        for (Long teacherId : teachersId) {
-            TeacherCourse teacherCourse = TeacherCourse.builder().courseId(course.getId()).teacherId(teacherId).build();
-            teacherCourseDao.updateById(teacherCourse);
-        }
-        return true;
     }
 
-    /**
-     * 获取课程列表(分页)
-     *
-     * @param pageDto
-     * @return
-     */
     @Override
-    public List<CourseVO> list(PageDto pageDto) {
-        return courseDao.list(pageDto);
+    public ApiResult deleteCourse(long id) {
+        boolean removed = courseDao.removeById(id);
+        if (removed) {
+            teacherCourseDao.remove(new QueryWrapper<TeacherCourse>().eq("course_id", id));
+            log.info("课程删除成功");
+            return ApiResult.success("课程删除成功");
+        } else {
+            log.warn("课程删除失败");
+            return ApiResult.fail("删除失败，课程不存在");
+        }
+    }
+
+    @Override
+    public ApiResult getCourseById(long id) {
+        Course course = courseDao.getById(id);
+        if (course == null) {
+            log.warn("课程不存在, ID: {}", id);
+            return ApiResult.fail("课程不存在");
+        }
+        CourseVO vo = new CourseVO();
+        BeanUtils.copyProperties(course, vo);
+        return ApiResult.success(vo);
+    }
+
+    @Override
+    public ApiResult getCourses(long page, long size, String keyword) {
+        Page<Course> pageParam = new Page<>(page, size);
+
+        QueryWrapper<Course> queryWrapper = new QueryWrapper<>();
+        if (keyword != null && !keyword.isEmpty()) {
+            queryWrapper.like("name", keyword);
+        }
+
+        Page<Course> resultPage = courseDao.page(pageParam, queryWrapper);
+
+        List<CourseVO> voList = resultPage.getRecords().stream().map(course -> {
+            CourseVO vo = new CourseVO();
+            BeanUtils.copyProperties(course, vo);
+            return vo;
+        }).collect(Collectors.toList());
+        
+        return ApiResult.success(voList);
     }
 }

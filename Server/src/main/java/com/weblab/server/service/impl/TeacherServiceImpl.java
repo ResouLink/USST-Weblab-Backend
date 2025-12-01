@@ -1,123 +1,105 @@
 package com.weblab.server.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.weblab.common.exception.ServiceException;
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.dao.TeacherCourseDao;
 import com.weblab.server.dao.TeacherDao;
-import com.weblab.server.dto.PageDto;
 import com.weblab.server.dto.TeacherDTO;
 import com.weblab.server.entity.Teacher;
 import com.weblab.server.entity.TeacherCourse;
 import com.weblab.server.service.TeacherService;
 import com.weblab.server.vo.TeacherVO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class TeacherServiceImpl implements TeacherService {
-    @Autowired
-    private TeacherDao teacherDao;
-    @Autowired
-    private TeacherCourseDao teacherCourseDao;
+    private final TeacherDao teacherDao;
+    private final TeacherCourseDao teacherCourseDao;
 
     @Override
-    public Teacher getById(Long id) {
+    public ApiResult addTeacher(TeacherDTO teacherDTO) {
+        Teacher newTeacher = new Teacher();
+        BeanUtils.copyProperties(teacherDTO, newTeacher);
+        teacherDao.save(newTeacher);
+        log.info("教师添加成功");
+        return ApiResult.success("添加教师成功");
+    }
+
+    @Override
+    public ApiResult updateTeacher(TeacherDTO teacherDTO, long id) {
+        Teacher existing = teacherDao.getById(id);
+        if (existing == null) {
+            log.warn("教师不存在");
+            return ApiResult.fail(1, "教师不存在");
+        }
+
+        BeanUtils.copyProperties(teacherDTO, existing);
+        existing.setId(id);
+
+        boolean updated = teacherDao.updateById(existing);
+        if (updated) {
+            log.info("教师更新成功");
+            return ApiResult.success("教师更新成功", 1);
+        } else {
+            log.warn("教师更新失败");
+            return ApiResult.fail(1, "更新失败");
+        }
+    }
+
+    @Override
+    public ApiResult deleteTeacher(long id) {
+        boolean removed = teacherDao.removeById(id);
+        if (removed) {
+            teacherCourseDao.remove(new QueryWrapper<TeacherCourse>().eq("teacher_id", id));
+            log.info("教师删除成功");
+            return ApiResult.success("教师删除成功");
+        } else {
+            log.warn("教师删除失败");
+            return ApiResult.fail("删除失败，教师不存在");
+        }
+    }
+
+    @Override
+    public ApiResult getTeacherById(long id) {
         Teacher teacher = teacherDao.getById(id);
-        if (BeanUtil.isEmpty(teacher)){
-            throw new ServiceException("教师ID不存在: " + id);
+        if (teacher == null) {
+            log.warn("教师不存在, ID: {}", id);
+            return ApiResult.fail("教师不存在");
         }
-        return teacher;
-    }
-
-    /**
-     * 获取教师列表
-     * @param pageDto
-     * @return
-     */
-    @Override
-    public List<Teacher> list(PageDto pageDto) {
-        if (BeanUtil.isEmpty(pageDto)){
-            throw new ServiceException("参数不能为空");
-        }
-        // 获取分页数据
-        Page<Teacher> page = teacherDao.page(new Page<>(pageDto.getPage(), pageDto.getSize()));
-        return page.getRecords();
+        TeacherVO vo = new TeacherVO();
+        BeanUtils.copyProperties(teacher, vo);
+        return ApiResult.success(vo);
     }
 
     @Override
-    public Boolean save(Teacher teacher) {
-        if (BeanUtil.isEmpty(teacher)){
-            throw new ServiceException("新增教师为空!");
-        }
-        return teacherDao.save(teacher);
-    }
+    public ApiResult getTeachers(long page, long size, String keyword) {
+        Page<Teacher> pageParam = new Page<>(page, size);
 
-    /**
-     * 修改教师信息（简介，职称等）
-     * @param teacher
-     * @return
-     */
-    @Override
-    public Boolean update(Teacher teacher) {
-        if (BeanUtil.isEmpty(teacher)){
-            throw new ServiceException("修改教师为空!");
+        QueryWrapper<Teacher> queryWrapper = new QueryWrapper<>();
+        if (keyword != null && !keyword.isEmpty()) {
+            queryWrapper.like("name", keyword);
         }
-        return teacherDao.updateById(teacher);
-    }
 
-    @Override
-    public Boolean delete(Long id) {
-        if (BeanUtil.isEmpty(id)) {
-            throw new ServiceException("删除id为空!");
-        }
-        return teacherDao.removeById(id);
-    }
+        Page<Teacher> resultPage = teacherDao.page(pageParam, queryWrapper);
 
-    /**
-     * 添加老师讲授课程
-     * @param teacherId
-     * @param courseId
-     * @return
-     */
-    @Override
-    public Boolean addTeachCourse(Long teacherId, Long courseId) {
-        if (BeanUtil.isEmpty(teacherId) || BeanUtil.isEmpty(courseId)){
-            throw new ServiceException("参数不能为空");
-        }
-        TeacherCourse teacherCourse = new TeacherCourse(courseId, teacherId);
-        return teacherCourseDao.save(teacherCourse);
-    }
+        List<TeacherVO> voList = resultPage.getRecords().stream().map(teacher -> {
+            TeacherVO vo = new TeacherVO();
+            BeanUtils.copyProperties(teacher, vo);
+            return vo;
+        }).collect(Collectors.toList());
 
-    /**
-     * 删除老师讲授课程
-     * @param teacherId
-     * @param courseId
-     * @return
-     */
-    @Override
-    public Boolean deleteTeachCourse(Long teacherId, Long courseId) {
-        if (BeanUtil.isEmpty(teacherId) || BeanUtil.isEmpty(courseId)){
-            throw new ServiceException("参数不能为空");
-        }
-        return teacherCourseDao.remove(new QueryWrapper<TeacherCourse>().eq("teacher_id", teacherId).eq("course_id", courseId));
+        return ApiResult.success(voList);
     }
-
-    /**
-     * 获取老师所授课程
-     * @param id
-     * @return
-     */
-    @Override
-    public List<Long> getTeachCourses(Long id) {
-        if (BeanUtil.isEmpty(id)){
-            throw new ServiceException("参数不能为空");
-        }
-        return teacherCourseDao.list(new QueryWrapper<TeacherCourse>().eq("teacher_id", id)).stream().map(TeacherCourse::getCourseId).toList();
-    }
-
 
 }

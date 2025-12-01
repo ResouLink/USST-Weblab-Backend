@@ -1,14 +1,11 @@
 package com.weblab.server.service;
 
+import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.ResourceDTO;
-import com.weblab.server.vo.ResourceVO;
 
 public interface ResourceService {
-    ResourceVO getById(Long id);
-
-    Boolean save(ResourceDTO resourceDTO);
-
-    Boolean update(Long id, ResourceDTO resourceDTO);
-
-    Boolean delete(Long id);
+    ApiResult addResource(ResourceDTO resourceDTO);
+    ApiResult updateResource(ResourceDTO resourceDTO, long id);
+    ApiResult deleteResource(long id);
+    ApiResult getResourceById(long id);
 }

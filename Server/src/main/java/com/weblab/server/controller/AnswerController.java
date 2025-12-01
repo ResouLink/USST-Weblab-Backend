@@ -1,47 +1,39 @@
 package com.weblab.server.controller;
 
 import com.weblab.common.result.ApiResult;
-import com.weblab.server.dto.CourseDTO;
-import com.weblab.server.dto.PageDto;
+import com.weblab.server.dto.AnswerDTO;
 import com.weblab.server.service.AnswerService;
-import com.weblab.server.vo.AnswerVO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/answer/")
+@RequiredArgsConstructor
+@RequestMapping("/api/answers")
 public class AnswerController {
-    @Autowired
-    private AnswerService answerService;
+    private final AnswerService answerService;
 
-    @GetMapping("{id}")
-    public ApiResult<AnswerVO> getById(@PathVariable Long id) {
-        return ApiResult.success(answerService.getById(id));
+    @PostMapping
+    public ApiResult addAnswer(@RequestBody AnswerDTO answerDTO) {
+        return answerService.addAnswer(answerDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ApiResult updateAnswer(@PathVariable long id, @RequestBody AnswerDTO answerDTO) {
+        return answerService.updateAnswer(answerDTO, id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResult deleteAnswer(@PathVariable long id) {
+        return answerService.deleteAnswer(id);
+    }
+
+    @GetMapping("/{id}")
+    public ApiResult getAnswer(@PathVariable long id) {
+        return answerService.getAnswerById(id);
     }
 
     @GetMapping
-    public ApiResult<List<AnswerVO>> list(@RequestParam String keyword,
-                                          @RequestParam long page,
-                                          @RequestParam long size) {
-        PageDto pageDto = new PageDto(keyword, page, size);
-        return ApiResult.success(answerService.list(pageDto));
+    public ApiResult getAnswers(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
+        return answerService.getAnswers(page, size, keyword);
     }
-
-    @PostMapping
-    public ApiResult<Boolean> save(@RequestBody CourseDTO courseDTO) {
-        return ApiResult.success(answerService.save(courseDTO));
-    }
-
-    @DeleteMapping("{id}")
-    public ApiResult<Boolean> delete(@PathVariable Long id) {
-        return ApiResult.success(answerService.delete(id));
-    }
-
-    @PutMapping("{id}")
-    public ApiResult<Boolean> update(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
-        return ApiResult.success(answerService.update(courseDTO));
-    }
-
 }

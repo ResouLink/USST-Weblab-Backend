@@ -1,61 +1,41 @@
 package com.weblab.server.controller;
 
 import com.weblab.common.result.ApiResult;
-import com.weblab.server.dto.PageDto;
-import com.weblab.server.entity.Teacher;
+import com.weblab.server.dto.TeacherDTO;
 import com.weblab.server.service.TeacherService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/teachers/")
+@RequiredArgsConstructor
+@RequestMapping("/api/teachers")
 public class TeacherController {
 
-    @Autowired
-    private TeacherService teacherService;
+    private final TeacherService teacherService;
 
-    @GetMapping("{id}")
-    public ApiResult<Teacher> getById(@PathVariable Long id) {
-        return ApiResult.success(teacherService.getById(id));
+    @PostMapping
+    public ApiResult addTeacher(@RequestBody TeacherDTO teacherDTO) {
+        return teacherService.addTeacher(teacherDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ApiResult updateTeacher(@PathVariable long id, @RequestBody TeacherDTO teacherDTO) {
+        return teacherService.updateTeacher(teacherDTO, id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResult deleteTeacher(@PathVariable long id) {
+        return teacherService.deleteTeacher(id);
+    }
+
+    @GetMapping("/{id}")
+    public ApiResult getTeacher(@PathVariable long id) {
+        return teacherService.getTeacherById(id);
     }
 
     @GetMapping
-    public ApiResult<List<Teacher>> list(@RequestParam String keyword,
-                                         @RequestParam long page,
-                                         @RequestParam long size) {
-        PageDto pageDto = new PageDto(keyword, page, size);
-        return ApiResult.success(teacherService.list(pageDto));
-    }
-    @PostMapping
-    public ApiResult<Boolean> save(@RequestBody Teacher teacher) {
-        return ApiResult.success(teacherService.save(teacher));
+    public ApiResult getTeachers(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
+        return teacherService.getTeachers(page, size, keyword);
     }
 
-    @PutMapping("{id}")
-    public ApiResult<Boolean> update(@PathVariable Long id, @RequestBody Teacher teacher) {
-        teacher.setId(id);
-        return ApiResult.success(teacherService.update(teacher));
-    }
-
-    @DeleteMapping("{id}")
-    public ApiResult<Boolean> delete(@PathVariable Long id) {
-        return ApiResult.success(teacherService.delete(id));
-    }
-
-    @PutMapping("{teacher_id}/courses/{course_id}")
-    public ApiResult<Boolean> addTeachCourse(@PathVariable Long teacher_id, @PathVariable Long course_id) {
-        return ApiResult.success(teacherService.addTeachCourse(teacher_id, course_id));
-    }
-
-    @DeleteMapping("{teacher_id}/courses/{courses_id}")
-    public ApiResult<Boolean> deleteTeachCourse(@PathVariable Long teacher_id, @PathVariable Long course_id) {
-        return ApiResult.success(teacherService.deleteTeachCourse(teacher_id, course_id));
-    }
-
-    @GetMapping("{id}/courses")
-    public ApiResult<List<Long>> getTeachCourses(@PathVariable Long id) {
-        return ApiResult.success(teacherService.getTeachCourses(id));
-    }
 }

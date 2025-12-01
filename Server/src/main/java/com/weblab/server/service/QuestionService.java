@@ -1,19 +1,12 @@
 package com.weblab.server.service;
 
-import com.weblab.server.dto.CourseDTO;
-import com.weblab.server.dto.PageDto;
-import com.weblab.server.vo.QuestionVO;
-
-import java.util.List;
+import com.weblab.common.result.ApiResult;
+import com.weblab.server.dto.QuestionDTO;
 
 public interface QuestionService {
-    QuestionVO getById(Long id);
-
-    List<QuestionVO> list(PageDto pageDto);
-
-    Boolean save(CourseDTO courseDTO);
-
-    Boolean delete(Long id);
-
-    Boolean update(CourseDTO courseDTO);
+    ApiResult addQuestion(QuestionDTO questionDTO);
+    ApiResult updateQuestion(QuestionDTO questionDTO, long id);
+    ApiResult deleteQuestion(long id);
+    ApiResult getQuestionById(long id);
+    ApiResult getQuestions(long page, long size, String keyword);
 }
