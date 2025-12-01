@@ -1,5 +1,6 @@
 package com.weblab.server.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.result.ApiResult;
@@ -100,6 +101,25 @@ public class TeacherServiceImpl implements TeacherService {
         }).collect(Collectors.toList());
 
         return ApiResult.success(voList);
+    }
+
+    @Override
+    public void addTeacherCourse(long teacherId, long courseId) {
+        teacherCourseDao.save(TeacherCourse.builder().teacherId(teacherId).courseId(courseId).build());
+    }
+
+    @Override
+    public void deleteTeacherCourse(long teacherId, long courseId) {
+        teacherCourseDao.remove(new LambdaQueryWrapper<TeacherCourse>()
+                .eq(TeacherCourse::getTeacherId, teacherId)
+                .eq(TeacherCourse::getCourseId, courseId));
+    }
+
+    @Override
+    public List<Long> getTeacherCourses(long teacherId) {
+        LambdaQueryWrapper<TeacherCourse> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TeacherCourse::getTeacherId, teacherId).select(TeacherCourse::getCourseId);
+        return teacherCourseDao.listObjs(queryWrapper, obj->(Long) obj);
     }
 
 }

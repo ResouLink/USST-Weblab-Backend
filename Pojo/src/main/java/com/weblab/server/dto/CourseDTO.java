@@ -3,6 +3,7 @@ package com.weblab.server.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class CourseDTO implements Serializable {
@@ -21,5 +22,5 @@ public class CourseDTO implements Serializable {
     /**
      * 授课老师主键数据
      */
-    private long[] teachersId;
+    private List<Long> teachersId;
 }

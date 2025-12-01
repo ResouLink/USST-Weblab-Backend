@@ -10,8 +10,4 @@ import java.util.List;
 
 @Mapper
 public interface CourseMapper extends BaseMapper<Course> {
-
-    CourseVO getById(Long id);
-
-    List<CourseVO> list(PageDto pageDto);
 }
