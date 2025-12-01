@@ -11,9 +11,9 @@
 
     <resultMap id="CourseVoResult" type="com.weblab.server.vo.CourseVO">
         <id column="id" property="id"/>
-        <result column="cname" property="name"/>
+        <result column="name" property="name"/>
         <result column="description" property="description"/>
-        <result column="collage" property="college"/>
+        <result column="college" property="college"/>
         <result column="create_at" property="createAt"/>
         <result column="update_at" property="updateAt"/>
         <collection property="teachers" ofType="com.weblab.server.vo.CourseTeacherVO"
@@ -23,9 +23,9 @@
     <select id="getById" resultMap="CourseVoResult">
         SELECT
             c.id,
-            c.cname,
+            c.name,
             c.description,
-            c.collage,
+            c.college,
             c.create_at,
             c.update_at,
             t.id as id,
@@ -40,9 +40,9 @@
     <select id="list" resultMap="CourseVoResult">
         SELECT
             c.id,
-            c.cname,
+            c.name,
             c.description,
-            c.collage,
+            c.college,
             c.create_at,
             c.update_at,
             t.id as id,
@@ -50,6 +50,7 @@
         FROM course c
                  LEFT JOIN teacher_course tc ON c.id = tc.course_id
                  LEFT JOIN teacher t ON tc.teacher_id = t.id
+            WHERE c.name LIKE CONCAT('%', #{keyword}, '%')
             LIMIT #{page}, #{size};
     </select>
 
