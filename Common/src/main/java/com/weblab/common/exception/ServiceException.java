@@ -7,18 +7,22 @@ import lombok.Data;
  */
 @Data
 public class ServiceException extends RuntimeException {
-  BaseEnum resultCode;
+  ErrorEnum errorCode;
 
+  public ServiceException() {
+    super();
+    this.errorCode = ErrorEnum.Fail;
+  }
   public ServiceException(String msg) {
     super(msg);
-    this.resultCode = ResultCode.Fail;
+    this.errorCode = ErrorEnum.Fail;
   }
-  public ServiceException(BaseEnum resultCode) {
-    super(resultCode.getName());
-    this.resultCode = resultCode;
+  public ServiceException(ErrorEnum errorCode) {
+    super(errorCode.getMessage());
+    this.errorCode = errorCode;
   }
-  public ServiceException(BaseEnum resultCode, String msg) {
+  public ServiceException(ErrorEnum errorCode, String msg) {
     super(msg);
-    this.resultCode = resultCode;
+    this.errorCode = errorCode;
   }
 }
