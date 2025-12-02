@@ -8,6 +8,7 @@ import com.weblab.server.dao.FileListDao;
 import com.weblab.server.dao.QuestionDao;
 import com.weblab.server.dto.QuestionDTO;
 import com.weblab.server.entity.Question;
+import com.weblab.server.event.NotificationListener;
 import com.weblab.server.service.QuestionService;
 import com.weblab.server.vo.QuestionVO;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionDao questionDao;
     private final FileListDao fileListDao;
+    private final NotificationListener notificationListener;
 
     @Override
     public ApiResult addQuestion(QuestionDTO questionDTO) {
