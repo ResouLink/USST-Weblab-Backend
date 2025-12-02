@@ -25,7 +25,7 @@ public class OssFileServiceImpl implements OssFileService {
     private final AliOssUtil aliOssUtil;
 
     @Override
-    public ApiResult uploadFile(MultipartFile file) {
+    public FileVO uploadFile(MultipartFile file) {
         try {
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -47,11 +47,11 @@ public class OssFileServiceImpl implements OssFileService {
                     .build();
 
             log.info("文件上传成功, 文件ID: {}", fileInfo.getId());
-            return ApiResult.success(fileVO);
+            return fileVO;
 
         } catch (IOException e) {
             log.error("文件上传失败", e);
-            return ApiResult.fail("文件上传失败: " + e.getMessage());
+            return null;
         }
     }
 

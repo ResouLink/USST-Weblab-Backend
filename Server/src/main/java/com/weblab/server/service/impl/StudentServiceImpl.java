@@ -63,6 +63,7 @@ public class StudentServiceImpl implements StudentService {
     public ApiResult deleteStudent(long id) {
         boolean removed = studentDao.removeById(id);
         if (removed) {
+            studentCourseDao.remove(new LambdaQueryWrapper<StudentCourse>().eq(StudentCourse::getStudentId,id));
             return ApiResult.success("学生删除成功");
         } else {
             return ApiResult.fail("删除失败，学生不存在");

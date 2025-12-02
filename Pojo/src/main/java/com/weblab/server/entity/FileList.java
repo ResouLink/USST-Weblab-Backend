@@ -30,7 +30,7 @@ public class FileList implements Serializable {
     private long fileRole;
 
     /**
-     * 归属于对应表里面的主键，由file_role决定去回答表还是去提问表查询
+     * 归属于对应表里面的主键，由file_role决定去回答表还是去提问还是用户表表查询
      */
     private long nodeId;
 

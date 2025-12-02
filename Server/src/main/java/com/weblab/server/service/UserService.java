@@ -1,7 +1,17 @@
 package com.weblab.server.service;
 
-import com.weblab.common.result.ApiResult;
+import com.weblab.server.dto.UserRegisterDTO;
+import com.weblab.server.dto.UserUpdateDTO;
+import com.weblab.server.vo.UserVO;
+
+import java.io.IOException;
+import java.util.List;
 
 public interface UserService {
-    ApiResult getUserById(long id);
+    void addUserStudent(UserRegisterDTO userRegisterDTO) throws IOException;
+    void addUserTeacher(UserRegisterDTO userRegisterDTO) throws IOException;
+    void updateUser(UserUpdateDTO userUpdateDTO, long id);
+    void deleteUser(long id);
+    UserVO getUserById(long id);
+    List<UserVO> getUsers(long page, long size, String keyword);
 }

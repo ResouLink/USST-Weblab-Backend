@@ -28,11 +28,11 @@ public class UserVO implements Serializable {
     /**
      * 对应角色主键，先通过role去判断是谁然后再去对应的表中找
      */
-    private String roleId;
+    private Long roleId;
     /**
      * 用户角色，0代表老师，1代表学生
      */
-    private long userRole;
+    private Long userRole;
     /**
      * 用户名称
      */

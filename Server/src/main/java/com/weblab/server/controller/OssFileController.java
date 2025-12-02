@@ -18,7 +18,7 @@ public class OssFileController {
     @PostMapping
     public ApiResult uploadFile(@RequestPart("file") MultipartFile file) {
         try {
-            return ossFileService.uploadFile(file);
+            return ApiResult.success(ossFileService.uploadFile(file));
         } catch (Exception e) {
             log.error("文件上传失败", e);
             return ApiResult.fail("文件上传失败: " + e.getMessage());
