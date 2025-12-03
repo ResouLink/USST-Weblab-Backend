@@ -2,7 +2,9 @@ package com.weblab.server.service;
 
 import com.weblab.server.dto.UserRegisterDTO;
 import com.weblab.server.dto.UserUpdateDTO;
+import com.weblab.server.entity.Users;
 import com.weblab.server.vo.UserVO;
+import org.springframework.security.core.userdetails.User;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,4 +16,5 @@ public interface UserService {
     void deleteUser(long id);
     UserVO getUserById(long id);
     List<UserVO> getUsers(long page, long size, String keyword);
+    Users getUserByRoleId(long roleId, long id);
 }

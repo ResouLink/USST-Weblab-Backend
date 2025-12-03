@@ -6,5 +6,5 @@ import java.lang.reflect.InvocationTargetException;
 
 public interface NotificationService {
 
-    <T, D> Boolean addNotification(T t, D d) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException;
+    <T, D> Notification addNotification(T t, D d) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException;
 }

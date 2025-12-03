@@ -4,15 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.weblab.common.result.ApiResult;
 import com.weblab.server.dao.FileListDao;
-import com.weblab.server.dao.StudentDao;
-import com.weblab.server.dao.TeacherDao;
 import com.weblab.server.dao.UserDao;
 import com.weblab.server.dto.UserRegisterDTO;
 import com.weblab.server.dto.UserUpdateDTO;
 import com.weblab.server.entity.FileList;
-import com.weblab.server.entity.Student;
 import com.weblab.server.entity.Users;
 import com.weblab.server.service.OssFileService;
 import com.weblab.server.service.StudentService;
@@ -41,7 +37,7 @@ public class UserServiceImpl implements UserService {
     private final FileListDao fileListDao;
     private final StudentService studentService;
     private final TeacherService teacherService;
-    private final OssFileService  ossFileService;
+    private final OssFileService ossFileService;
 
 
     @Override
@@ -107,12 +103,11 @@ public class UserServiceImpl implements UserService {
         boolean update = userDao.updateById(existingUser);
         if (update && userUpdateDTO.getAvatarId() != null) {
             fileListDao.update(null, new LambdaUpdateWrapper<FileList>()
-                    .eq(FileList::getFileRole,3)
+                    .eq(FileList::getFileRole, 3)
                     .eq(FileList::getNodeId, id)
                     .set(FileList::getFileId, userUpdateDTO.getAvatarId()));
             log.info("用户更新成功");
-        }
-        else {
+        } else {
             log.warn("用户更新失败");
         }
     }
@@ -123,7 +118,7 @@ public class UserServiceImpl implements UserService {
         userDao.removeById(id);
         //删除filelist中相关的记录（头像的）
         FileList existingfileList = fileListDao.getOne(new LambdaQueryWrapper<FileList>()
-                .eq(FileList::getFileRole,3)
+                .eq(FileList::getFileRole, 3)
                 .eq(FileList::getNodeId, id));
 
         fileListDao.remove(new LambdaQueryWrapper<FileList>()
@@ -132,7 +127,7 @@ public class UserServiceImpl implements UserService {
 
         //删除头像的实际数据
         ossFileService.deleteFile(existingfileList.getFileId());
-        if(existingUser.getRoleId() != null) {
+        if (existingUser.getRoleId() != null) {
             //是学生
             if (existingUser.getUserRole() == 1) {
                 studentService.deleteStudent(existingUser.getRoleId());
@@ -182,4 +177,22 @@ public class UserServiceImpl implements UserService {
 
         return voList;
     }
+
+    /**
+     * 通过角色id获取用户（studentId or teacherId）
+     *
+     * @param userRole
+     * @param roleId
+     * @return
+     */
+    @Override
+    public Users getUserByRoleId(long userRole, long roleId) {
+        if (userRole == 0) {
+            return userDao.query().eq("user_role", 0).eq("role_id", roleId).one();
+        } else if (userRole == 1) {
+            return userDao.query().eq("user_role", 1).eq("role_id", roleId).one();
+        }
+        return null;
+    }
+
 }

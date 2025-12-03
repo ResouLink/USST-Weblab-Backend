@@ -9,16 +9,20 @@ import com.weblab.server.dto.QuestionDTO;
 import com.weblab.server.entity.Course;
 import com.weblab.server.entity.Notification;
 import com.weblab.server.entity.Question;
+import com.weblab.server.event.NotificationEvent;
 import com.weblab.server.event.NotificationListener;
+import com.weblab.server.service.NotificationService;
 import com.weblab.server.service.QuestionService;
 import com.weblab.server.vo.CourseTeacherVO;
 import com.weblab.server.vo.QuestionVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +33,9 @@ import java.util.stream.Collectors;
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionDao questionDao;
     private final FileListDao fileListDao;
-    private final NotificationListener notificationListener;
-    private final NotificationDao notificationDao;
     private final TeacherCourseDao teacherCourseDao;
+    private final NotificationService notificationService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -39,6 +43,13 @@ public class QuestionServiceImpl implements QuestionService {
         Question newQuestion = new Question();
         BeanUtils.copyProperties(questionDTO, newQuestion);
         questionDao.save(newQuestion);
+        Notification notification = new Notification();
+        try {
+            notification = notificationService.addNotification(newQuestion, teacherCourseDao);
+        } catch (Exception e) {
+            log.warn("添加通知失败");
+        }
+        applicationEventPublisher.publishEvent(new NotificationEvent(this, notification.getId())); // 发送通知事件
         log.info("问题添加成功");
         return ApiResult.success("添加问题成功");
     }

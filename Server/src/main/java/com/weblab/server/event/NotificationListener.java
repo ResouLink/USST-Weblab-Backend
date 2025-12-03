@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.weblab.common.exception.ServiceException;
 import com.weblab.server.dao.NotificationDao;
 import com.weblab.server.entity.Notification;
+import com.weblab.server.entity.Users;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -31,7 +32,7 @@ public class NotificationListener implements ApplicationListener<NotificationEve
     public void putNotificationQueue(Long notificationId) {
         Notification notification = notificationDao.getById(notificationId);
         if (BeanUtil.isEmpty(notification)) {
-            log.info("通知不存在");
+            log.error("通知不存在");
             return;
         }
         boolean isPut = NotificationQueue.putNotification(notification);
@@ -39,5 +40,10 @@ public class NotificationListener implements ApplicationListener<NotificationEve
             log.error("插入队列被打断");
             throw new ServiceException("插入队列被打断");
         }
+    }
+
+    // todo
+    Users getAcceptUser(Notification notification){
+        return null;
     }
 }

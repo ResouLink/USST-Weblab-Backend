@@ -1,10 +1,10 @@
 package com.weblab.server.event;
 
-import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
+
 
 
 public class NotificationEvent extends ApplicationEvent {
