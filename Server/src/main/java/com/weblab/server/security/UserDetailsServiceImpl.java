@@ -19,7 +19,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Users user = userDao.getByUsername(username);
-        UserHolder.saveLoginUser(StrUtil.toString(user.getId()));
+//        UserHolder.saveLoginUser(StrUtil.toString(user.getId()));
 
         if (user == null) {
             throw new UsernameNotFoundException("用户不存在");
