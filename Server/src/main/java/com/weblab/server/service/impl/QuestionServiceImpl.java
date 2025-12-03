@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.common.result.ApiResult;
-import com.weblab.server.dao.FileListDao;
-import com.weblab.server.dao.QuestionDao;
+import com.weblab.server.dao.*;
 import com.weblab.server.dto.QuestionDTO;
+import com.weblab.server.entity.Course;
+import com.weblab.server.entity.Notification;
 import com.weblab.server.entity.Question;
 import com.weblab.server.event.NotificationListener;
 import com.weblab.server.service.QuestionService;
+import com.weblab.server.vo.CourseTeacherVO;
 import com.weblab.server.vo.QuestionVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +30,11 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionDao questionDao;
     private final FileListDao fileListDao;
     private final NotificationListener notificationListener;
+    private final NotificationDao notificationDao;
+    private final TeacherCourseDao teacherCourseDao;
 
     @Override
+    @Transactional
     public ApiResult addQuestion(QuestionDTO questionDTO) {
         Question newQuestion = new Question();
         BeanUtils.copyProperties(questionDTO, newQuestion);
@@ -78,10 +83,10 @@ public class QuestionServiceImpl implements QuestionService {
             log.warn("问题不存在, ID: {}", id);
             return ApiResult.fail("问题不存在");
         }
-        
+
         List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.QUESTION, id);
         List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
-        
+
         QuestionVO vo = new QuestionVO();
         BeanUtils.copyProperties(question, vo);
         vo.setFiles(files);
@@ -102,7 +107,7 @@ public class QuestionServiceImpl implements QuestionService {
         List<QuestionVO> voList = resultPage.getRecords().stream().map(question -> {
             List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.QUESTION, question.getId());
             List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
-            
+
             QuestionVO vo = new QuestionVO();
             BeanUtils.copyProperties(question, vo);
             vo.setFiles(files);

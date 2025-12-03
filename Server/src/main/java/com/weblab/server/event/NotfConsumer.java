@@ -1,8 +1,9 @@
 package com.weblab.server.event;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.weblab.common.utils.UserHolder;
+import com.weblab.common.utils.SecurityUtil;
 import com.weblab.server.entity.Notification;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,8 @@ public class NotfConsumer implements Runnable {
                     continue;
                 }
                 String content = JSONUtil.toJsonStr(consumeNotification);
-                String loginUser = UserHolder.getLoginUser();
+                // todo
+                String loginUser = StrUtil.toString(SecurityUtil.getUserId());
                 Boolean isSend = SseClient.sendMessage(loginUser, content);
                 if (!isSend) {
                     log.info("消息推送失败，将消息重新放入队列重试！");

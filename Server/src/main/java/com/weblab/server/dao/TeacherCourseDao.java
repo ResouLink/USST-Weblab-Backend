@@ -7,4 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TeacherCourseDao extends ServiceImpl<TeacherCourseMapper, TeacherCourse> {
+    Long getByCourseId(long courseId){
+        return query().eq("course_id", courseId).one().getTeacherId();
+    }
 }
