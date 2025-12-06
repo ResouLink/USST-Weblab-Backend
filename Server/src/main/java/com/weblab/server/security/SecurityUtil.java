@@ -1,6 +1,5 @@
-package com.weblab.common.utils;
+package com.weblab.server.security;
 
-import com.weblab.server.security.LoginUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 

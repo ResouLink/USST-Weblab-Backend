@@ -1,6 +1,5 @@
 package com.weblab.server.service.impl;
 
-import com.weblab.common.result.ApiResult;
 import com.weblab.common.utils.AliOssUtil;
 import com.weblab.server.dao.FileDao;
 import com.weblab.server.entity.File;
@@ -51,16 +50,16 @@ public class OssFileServiceImpl implements OssFileService {
 
         } catch (IOException e) {
             log.error("文件上传失败", e);
-            return null;
+            throw new RuntimeException("文件上传失败: " + e.getMessage());
         }
     }
 
     @Override
-    public ApiResult deleteFile(long id) {
+    public void deleteFile(long id) {
         File searchedFile = fileDao.getById(id);
         if (searchedFile == null) {
             log.warn("文件不存在, ID: {}", id);
-            return ApiResult.fail("文件不存在");
+            throw new RuntimeException("文件不存在");
         }
 
         try {
@@ -69,10 +68,9 @@ public class OssFileServiceImpl implements OssFileService {
             aliOssUtil.delete(filename);
             fileDao.removeById(id);
             log.info("文件删除成功, 文件ID: {}", id);
-            return ApiResult.success("删除文件成功");
         } catch (Exception e) {
             log.error("文件删除失败", e);
-            return ApiResult.fail("删除文件失败: " + e.getMessage());
+            throw new RuntimeException("删除文件失败: " + e.getMessage());
         }
     }
 }

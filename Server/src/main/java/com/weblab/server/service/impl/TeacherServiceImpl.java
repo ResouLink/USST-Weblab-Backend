@@ -3,7 +3,6 @@ package com.weblab.server.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.weblab.common.result.ApiResult;
 import com.weblab.server.dao.TeacherCourseDao;
 import com.weblab.server.dao.TeacherDao;
 import com.weblab.server.dto.TeacherDTO;
@@ -29,62 +28,58 @@ public class TeacherServiceImpl implements TeacherService {
     private final TeacherCourseDao teacherCourseDao;
 
     @Override
-    public ApiResult addTeacher(TeacherDTO teacherDTO) {
+    public long addTeacher(TeacherDTO teacherDTO) {
         Teacher newTeacher = new Teacher();
         BeanUtils.copyProperties(teacherDTO, newTeacher);
         teacherDao.save(newTeacher);
         log.info("教师添加成功");
-        return ApiResult.success("添加教师成功");
+        return newTeacher.getId();
     }
 
     @Override
-    public ApiResult updateTeacher(TeacherDTO teacherDTO, long id) {
+    public void updateTeacher(TeacherDTO teacherDTO, long id) {
         Teacher existing = teacherDao.getById(id);
         if (existing == null) {
             log.warn("教师不存在");
-            return ApiResult.fail(1, "教师不存在");
+            throw new RuntimeException("教师不存在");
         }
 
         BeanUtils.copyProperties(teacherDTO, existing);
         existing.setId(id);
 
         boolean updated = teacherDao.updateById(existing);
-        if (updated) {
-            log.info("教师更新成功");
-            return ApiResult.success("教师更新成功", 1);
-        } else {
+        if (!updated) {
             log.warn("教师更新失败");
-            return ApiResult.fail(1, "更新失败");
+            throw new RuntimeException("更新失败");
         }
+        log.info("教师更新成功");
     }
 
     @Override
-    public ApiResult deleteTeacher(long id) {
+    public void deleteTeacher(long id) {
         boolean removed = teacherDao.removeById(id);
-        if (removed) {
-            teacherCourseDao.remove(new QueryWrapper<TeacherCourse>().eq("teacher_id", id));
-            log.info("教师删除成功");
-            return ApiResult.success("教师删除成功");
-        } else {
+        if (!removed) {
             log.warn("教师删除失败");
-            return ApiResult.fail("删除失败，教师不存在");
+            throw new RuntimeException("删除失败，教师不存在");
         }
+        teacherCourseDao.remove(new QueryWrapper<TeacherCourse>().eq("teacher_id", id));
+        log.info("教师删除成功");
     }
 
     @Override
-    public ApiResult getTeacherById(long id) {
+    public TeacherVO getTeacherById(long id) {
         Teacher teacher = teacherDao.getById(id);
         if (teacher == null) {
             log.warn("教师不存在, ID: {}", id);
-            return ApiResult.fail("教师不存在");
+            throw new RuntimeException("教师不存在");
         }
         TeacherVO vo = new TeacherVO();
         BeanUtils.copyProperties(teacher, vo);
-        return ApiResult.success(vo);
+        return vo;
     }
 
     @Override
-    public ApiResult getTeachers(long page, long size, String keyword) {
+    public List<TeacherVO> getTeachers(long page, long size, String keyword) {
         Page<Teacher> pageParam = new Page<>(page, size);
 
         QueryWrapper<Teacher> queryWrapper = new QueryWrapper<>();
@@ -100,16 +95,16 @@ public class TeacherServiceImpl implements TeacherService {
             return vo;
         }).collect(Collectors.toList());
 
-        return ApiResult.success(voList);
+        return voList;
     }
 
     @Override
-    public void addTeacherCourse(long teacherId, long courseId) {
+    public void addTeacherCourse(long teacherId, long courseId) throws Exception {
         teacherCourseDao.save(TeacherCourse.builder().teacherId(teacherId).courseId(courseId).build());
     }
 
     @Override
-    public void deleteTeacherCourse(long teacherId, long courseId) {
+    public void deleteTeacherCourse(long teacherId, long courseId) throws Exception {
         teacherCourseDao.remove(new LambdaQueryWrapper<TeacherCourse>()
                 .eq(TeacherCourse::getTeacherId, teacherId)
                 .eq(TeacherCourse::getCourseId, courseId));

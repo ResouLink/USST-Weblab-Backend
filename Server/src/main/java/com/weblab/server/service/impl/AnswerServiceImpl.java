@@ -3,7 +3,6 @@ package com.weblab.server.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.enums.FileRoleEnum;
-import com.weblab.common.result.ApiResult;
 import com.weblab.server.dao.AnswerDao;
 import com.weblab.server.dao.FileListDao;
 import com.weblab.server.dto.AnswerDTO;
@@ -28,55 +27,48 @@ public class AnswerServiceImpl implements AnswerService {
     private final FileListDao fileListDao;
 
     @Override
-    public ApiResult addAnswer(AnswerDTO answerDTO) {
+    public void addAnswer(AnswerDTO answerDTO) {
         Answer newAnswer = new Answer();
         BeanUtils.copyProperties(answerDTO, newAnswer);
         answerDao.save(newAnswer);
         log.info("答案添加成功");
-        return ApiResult.success("添加答案成功");
     }
 
     @Override
-    public ApiResult updateAnswer(AnswerDTO answerDTO, long id) {
-        // 检查是否涉及联表更新
+    public void updateAnswer(AnswerDTO answerDTO, long id) {
         Answer existing = answerDao.getById(id);
         if (existing == null) {
             log.warn("答案不存在");
-            return ApiResult.fail(1, "答案不存在");
+            throw new RuntimeException("答案不存在");
         }
 
         BeanUtils.copyProperties(answerDTO, existing);
         existing.setId(id);
 
         boolean updated = answerDao.updateById(existing);
-        if (updated) {
-            log.info("答案更新成功");
-            return ApiResult.success("答案更新成功", 1);
-        } else {
+        if (!updated) {
             log.warn("答案更新失败");
-            return ApiResult.fail(1, "更新失败");
+            throw new RuntimeException("更新失败");
         }
+        log.info("答案更新成功");
     }
 
     @Override
-    public ApiResult deleteAnswer(long id) {
-        // 删除答案有问题，要判断是否涉及联表删除
+    public void deleteAnswer(long id) {
         boolean removed = answerDao.removeById(id);
-        if (removed) {
-            log.info("答案删除成功");
-            return ApiResult.success("答案删除成功");
-        } else {
+        if (!removed) {
             log.warn("答案删除失败");
-            return ApiResult.fail("删除失败，答案不存在");
+            throw new RuntimeException("删除失败，答案不存在");
         }
+        log.info("答案删除成功");
     }
 
     @Override
-    public ApiResult getAnswerById(long id) {
+    public AnswerVO getAnswerById(long id) {
         Answer answer = answerDao.getById(id);
         if (answer == null) {
             log.warn("答案不存在, ID: {}", id);
-            return ApiResult.fail("答案不存在");
+            throw new RuntimeException("答案不存在");
         }
         
         List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.ANSWER, id);
@@ -85,11 +77,11 @@ public class AnswerServiceImpl implements AnswerService {
         AnswerVO vo = new AnswerVO();
         BeanUtils.copyProperties(answer, vo);
         vo.setFiles(files);
-        return ApiResult.success(vo);
+        return vo;
     }
 
     @Override
-    public ApiResult getAnswers(long page, long size, String keyword) {
+    public List<AnswerVO> getAnswers(long page, long size, String keyword) {
         Page<Answer> pageParam = new Page<>(page, size);
 
         QueryWrapper<Answer> queryWrapper = new QueryWrapper<>();
@@ -109,6 +101,6 @@ public class AnswerServiceImpl implements AnswerService {
             return vo;
         }).collect(Collectors.toList());
 
-        return ApiResult.success(voList);
+        return voList;
     }
 }

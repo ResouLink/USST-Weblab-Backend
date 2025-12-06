@@ -7,7 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Data
@@ -22,7 +23,7 @@ public class ResourceVO implements Serializable {
     /**
      * 初次上传时间
      */
-    private String createAt;
+    private LocalDateTime createAt;
     /**
      * 资源描述
      */
@@ -34,7 +35,7 @@ public class ResourceVO implements Serializable {
     /**
      * 资源所在路径
      */
-    private String fileUrl;
+    private List<String> fileUrls;
     /**
      * 学习资源表主键
      */
@@ -46,7 +47,7 @@ public class ResourceVO implements Serializable {
     /**
      * 修改时间
      */
-    private String updateAt;
+    private LocalDateTime updateAt;
     /**
      * 上传者主键，取决于上传者角色是谁去哪个表照查
      */

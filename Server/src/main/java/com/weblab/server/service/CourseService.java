@@ -1,12 +1,14 @@
 package com.weblab.server.service;
 
-import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.CourseDTO;
+import com.weblab.server.vo.CourseVO;
+
+import java.util.List;
 
 public interface CourseService {
-    ApiResult addCourse(CourseDTO courseDTO);
-    ApiResult updateCourse(CourseDTO courseDTO, long id);
-    ApiResult deleteCourse(long id);
-    ApiResult getCourseById(long id);
-    ApiResult getCourses(long page, long size, String keyword);
+    void addCourse(CourseDTO courseDTO);
+    void updateCourse(CourseDTO courseDTO, long id);
+    void deleteCourse(long id);
+    CourseVO getCourseById(long id);
+    List<CourseVO> getCourses(long page, long size, String keyword);
 }

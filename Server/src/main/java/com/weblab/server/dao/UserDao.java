@@ -14,4 +14,20 @@ public class UserDao extends ServiceImpl<UserMapper, Users> {
                         .eq(Users::getUsername, username)
         );
     }
+
+
+    public boolean setRoleIfEmpty(Long userId, Long newRoleId) {
+        Users user = this.getById(userId);
+        if (user == null) {
+            return false;
+        }
+        if(user.getRoleId() == null) {
+            user.setRoleId(newRoleId);
+            return this.lambdaUpdate()
+                    .set(Users::getRoleId, newRoleId)
+                    .eq(Users::getId, userId)
+                    .update();
+        }
+        return false;
+    }
 }

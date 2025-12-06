@@ -1,9 +1,5 @@
 package com.weblab.server.event;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
-import com.weblab.common.utils.SecurityUtil;
 import com.weblab.server.entity.Notification;
 import com.weblab.server.service.UserService;
 import jakarta.annotation.PostConstruct;

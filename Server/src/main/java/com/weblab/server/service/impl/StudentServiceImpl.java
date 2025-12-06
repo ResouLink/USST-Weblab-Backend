@@ -3,7 +3,6 @@ package com.weblab.server.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.weblab.common.result.ApiResult;
 import com.weblab.server.dao.StudentCourseDao;
 import com.weblab.server.dao.StudentDao;
 import com.weblab.server.dto.StudentDTO;
@@ -30,19 +29,19 @@ public class StudentServiceImpl implements StudentService {
     private final StudentCourseDao studentCourseDao;
 
     @Override
-    public ApiResult addStudent(StudentDTO studentDTO) {
+    public long addStudent(StudentDTO studentDTO) {
         Student newStudent = new Student();
         BeanUtils.copyProperties(studentDTO, newStudent);
         studentDao.save(newStudent);
-        return ApiResult.success("添加学生成功");
+        return newStudent.getId();
     }
 
     @Override
-    public ApiResult updateStudent(StudentDTO studentDTO,long id) {
+    public void updateStudent(StudentDTO studentDTO,long id) {
         Student existing = studentDao.getById(id);
         if (existing == null) {
             log.warn("学生不存在");
-            return ApiResult.fail(1,"学生不存在");
+            throw new RuntimeException("学生不存在");
         }
 
         // 将 DTO 的属性拷贝到实体对象中
@@ -50,39 +49,34 @@ public class StudentServiceImpl implements StudentService {
         existing.setId(id); // 确保 ID 不被覆盖
 
         boolean updated = studentDao.updateById(existing);
-        if (updated) {
-            log.info("学生更新成功");
-            return ApiResult.success("学生更新成功",1);
-        } else {
+        if (!updated) {
             log.warn("学生更新失败");
-            return ApiResult.fail(1,"更新失败");
+            throw new RuntimeException("更新失败");
         }
     }
 
     @Override
-    public ApiResult deleteStudent(long id) {
+    public void deleteStudent(long id) {
         boolean removed = studentDao.removeById(id);
-        if (removed) {
-            studentCourseDao.remove(new LambdaQueryWrapper<StudentCourse>().eq(StudentCourse::getStudentId,id));
-            return ApiResult.success("学生删除成功");
-        } else {
-            return ApiResult.fail("删除失败，学生不存在");
+        if (!removed) {
+            throw new RuntimeException("删除失败，学生不存在");
         }
+        studentCourseDao.remove(new LambdaQueryWrapper<StudentCourse>().eq(StudentCourse::getStudentId,id));
     }
 
     @Override
-    public ApiResult getStudentById(long id) {
+    public StudentVO getStudentById(long id) {
         Student student = studentDao.getById(id);
         if (student == null) {
-            return ApiResult.fail("学生不存在");
+            throw new RuntimeException("学生不存在");
         }
         StudentVO vo = new StudentVO();
         BeanUtils.copyProperties(student, vo);
-        return ApiResult.success(vo);
+        return vo;
     }
 
     @Override
-    public ApiResult getStudents(long page, long size, String keyword) {
+    public List<StudentVO> getStudents(long page, long size, String keyword) {
         // 1. 构建分页对象
         Page<Student> pageParam = new Page<>(page, size);
 
@@ -101,8 +95,8 @@ public class StudentServiceImpl implements StudentService {
             BeanUtils.copyProperties(student, vo);
             return vo;
         }).collect(Collectors.toList());
-        // 5. 返回 ApiResult
-        return ApiResult.success(voList);
+        // 5. 返回列表
+        return voList;
     }
 
     @Override

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -15,7 +16,7 @@ public class TeacherVO implements Serializable {
     /**
      * 创建时间
      */
-    private String createAt;
+    private LocalDateTime createAt;
     /**
      * 性别，0是男，1是女
      */
@@ -39,5 +40,5 @@ public class TeacherVO implements Serializable {
     /**
      * 修改时间
      */
-    private String updateAt;
+    private LocalDateTime updateAt;
 }

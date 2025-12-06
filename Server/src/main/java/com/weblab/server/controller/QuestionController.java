@@ -4,8 +4,12 @@ import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.QuestionDTO;
 import com.weblab.server.service.QuestionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
+
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/questions")
@@ -14,26 +18,57 @@ public class QuestionController {
 
     @PostMapping
     public ApiResult addQuestion(@RequestBody QuestionDTO questionDTO) {
-        return questionService.addQuestion(questionDTO);
+        try {
+            questionService.addQuestion(questionDTO);
+            log.info("问题添加成功");
+            return ApiResult.success("添加问题成功");
+        } catch (Exception e) {
+            log.error("问题添加失败", e);
+            return ApiResult.fail(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
     public ApiResult updateQuestion(@PathVariable long id, @RequestBody QuestionDTO questionDTO) {
-        return questionService.updateQuestion(questionDTO, id);
+        try {
+            questionService.updateQuestion(questionDTO, id);
+            log.info("问题更新成功");
+            return ApiResult.success("问题更新成功", 1);
+        } catch (Exception e) {
+            log.error("问题更新失败", e);
+            return ApiResult.fail(1, e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     public ApiResult deleteQuestion(@PathVariable long id) {
-        return questionService.deleteQuestion(id);
+        try {
+            questionService.deleteQuestion(id);
+            log.info("问题删除成功");
+            return ApiResult.success("问题删除成功");
+        } catch (Exception e) {
+            log.error("问题删除失败", e);
+            return ApiResult.fail(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
     public ApiResult getQuestion(@PathVariable long id) {
-        return questionService.getQuestionById(id);
+        try {
+            return ApiResult.success(questionService.getQuestionById(id));
+        } catch (Exception e) {
+            log.error("获取问题失败", e);
+            return ApiResult.fail(e.getMessage());
+        }
     }
 
     @GetMapping
     public ApiResult getQuestions(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
-        return questionService.getQuestions(page, size, keyword);
+        try {
+            return ApiResult.success(questionService.getQuestions(page, size, keyword));
+        } catch (Exception e) {
+            log.error("获取问题列表失败", e);
+            return ApiResult.fail(e.getMessage());
+        }
     }
 }

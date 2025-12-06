@@ -3,6 +3,7 @@ package com.weblab.server.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 @Data
@@ -18,7 +19,7 @@ public class ResourceDTO implements Serializable {
     /**
      * 上传文件列表，是oss接口返回的在附件表中的主键数组
      */
-    private long[] files;
+    private List<Long> files;
     /**
      * 资源名称
      */

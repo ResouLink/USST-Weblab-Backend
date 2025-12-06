@@ -18,6 +18,7 @@ public class OssFileController {
     @PostMapping
     public ApiResult uploadFile(@RequestPart("file") MultipartFile file) {
         try {
+            log.info("文件上传开始");
             return ApiResult.success(ossFileService.uploadFile(file));
         } catch (Exception e) {
             log.error("文件上传失败", e);
@@ -28,7 +29,10 @@ public class OssFileController {
     @DeleteMapping("/{id}")
     public ApiResult deleteFile(@PathVariable long id) {
         try {
-            return ossFileService.deleteFile(id);
+            log.info("文件删除开始, ID: {}", id);
+            ossFileService.deleteFile(id);
+            log.info("文件删除成功");
+            return ApiResult.success("删除文件成功");
         } catch (Exception e) {
             log.error("文件删除失败", e);
             return ApiResult.fail("文件删除失败: " + e.getMessage());
