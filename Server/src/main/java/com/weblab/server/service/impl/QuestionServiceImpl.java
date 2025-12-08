@@ -35,6 +35,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final TeacherCourseDao teacherCourseDao;
     private final NotificationService notificationService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final FileDao fileDao;
 
     @Override
     @Transactional
@@ -90,7 +91,9 @@ public class QuestionServiceImpl implements QuestionService {
         }
 
         List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.QUESTION, id);
-        List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
+//        List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());         //todo这个是不是有问题，返回应该要去file表中找url返回的是url
+        List<String> files = fileDao.getFileUrls(fileIds); //修改后
+
 
         QuestionVO vo = new QuestionVO();
         BeanUtils.copyProperties(question, vo);
@@ -111,7 +114,8 @@ public class QuestionServiceImpl implements QuestionService {
 
         List<QuestionVO> voList = resultPage.getRecords().stream().map(question -> {
             List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.QUESTION, question.getId());
-            List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
+//            List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList()); //todo 同理
+            List<String> files = fileDao.getFileUrls(fileIds);  //返回urls
 
             QuestionVO vo = new QuestionVO();
             BeanUtils.copyProperties(question, vo);

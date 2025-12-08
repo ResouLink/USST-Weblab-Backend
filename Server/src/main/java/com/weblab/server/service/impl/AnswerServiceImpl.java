@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.server.dao.AnswerDao;
+import com.weblab.server.dao.FileDao;
 import com.weblab.server.dao.FileListDao;
 import com.weblab.server.dto.AnswerDTO;
 import com.weblab.server.entity.Answer;
@@ -25,12 +26,14 @@ import java.util.stream.Collectors;
 public class AnswerServiceImpl implements AnswerService {
     private final AnswerDao answerDao;
     private final FileListDao fileListDao;
+    private final FileDao fileDao;
 
     @Override
     public void addAnswer(AnswerDTO answerDTO) {
         Answer newAnswer = new Answer();
         BeanUtils.copyProperties(answerDTO, newAnswer);
         answerDao.save(newAnswer);
+        //todo 添加回答成功应该将对应的问题的已回答标记打上
         log.info("答案添加成功");
     }
 
@@ -72,7 +75,8 @@ public class AnswerServiceImpl implements AnswerService {
         }
         
         List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.ANSWER, id);
-        List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
+//        List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
+        List<String> files = fileDao.getFileUrls(fileIds);
         
         AnswerVO vo = new AnswerVO();
         BeanUtils.copyProperties(answer, vo);
@@ -93,8 +97,9 @@ public class AnswerServiceImpl implements AnswerService {
 
         List<AnswerVO> voList = resultPage.getRecords().stream().map(answer -> {
             List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.ANSWER, answer.getId());
-            List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
-            
+//            List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
+            List<String> files = fileDao.getFileUrls(fileIds);
+
             AnswerVO vo = new AnswerVO();
             BeanUtils.copyProperties(answer, vo);
             vo.setFiles(files);
