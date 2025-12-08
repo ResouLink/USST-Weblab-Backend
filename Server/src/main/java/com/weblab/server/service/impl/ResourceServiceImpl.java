@@ -1,6 +1,7 @@
 package com.weblab.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.common.enums.RoleEnum;
@@ -137,6 +138,18 @@ public class ResourceServiceImpl implements ResourceService {
 
         log.info("查询课程[{}]下的资源成功，共{}条", courseId, voList.size());
         return voList;
+    }
+
+    /**
+     * @param id 学习资源表主键
+     */
+    @Override
+    public void increaseDownloadCnt(long id) {
+        resourceDao.update(null,
+                new UpdateWrapper<Resource>()
+                        .setSql("download_count = download_count + 1")
+                        .eq("id", id)
+        );
     }
 
 

@@ -79,4 +79,16 @@ public class ResourcesController {
             return ApiResult.fail(e.getMessage());
         }
     }
+
+    @PostMapping("/download/{id}")
+    public ApiResult increaseCnt(@PathVariable long id) {
+        try {
+            resourceService.increaseDownloadCnt(id);
+            log.info("资源下载次数+1成功");
+            return ApiResult.success("资源下载次数+1成功");
+        } catch (Exception e) {
+            log.error("资源下载次数+1失败",e);
+            return ApiResult.fail(e.getMessage());
+        }
+    }
 }
