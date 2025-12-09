@@ -71,4 +71,36 @@ public class QuestionController {
             return ApiResult.fail(e.getMessage());
         }
     }
+
+    //查询老师待回答的问题
+    @GetMapping("/teachers/{teacher_id}")
+    public ApiResult getQuestionsToBeAnswered(@PathVariable("teacher_id") long teacherId) {
+        try {
+
+        } catch (Exception e) {
+            log.info("查询待回答问题失败",e);
+            return ApiResult.fail(e.getMessage());
+        }
+    }
+
+    @GetMapping("/students/{student_id}")
+    public ApiResult getQuestionsOfStutents(@PathVariable("student_id") long studentId) {
+        try {
+
+        } catch (Exception e) {
+            log.info("学生查询自己提问的问题失败",e);
+            return ApiResult.fail(e.getMessage());
+        }
+    }
+
+    @GetMapping("/courses/{course_id}")
+    public ApiResult getQuestionsByCourseId(@PathVariable("course_id") long courseId) {
+        try {
+
+        } catch (Exception e) {
+            log.info("获取一个课程下的所有问题失败",e);
+            return ApiResult.fail(e.getMessage());
+        }
+    }
+
 }

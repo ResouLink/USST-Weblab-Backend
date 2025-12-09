@@ -69,4 +69,15 @@ public class AnswerController {
             return ApiResult.fail(e.getMessage());
         }
     }
+
+
+    @GetMapping("/teachers/{teacher_id}")
+    public  ApiResult getAnswersOfTeacher(@PathVariable("teacher_id") long teacherId) {
+        try {
+
+        } catch (Exception e) {
+            log.info("老师查询自己的回答失败",e);
+            return ApiResult.fail(e.getMessage());
+        }
+    }
 }
