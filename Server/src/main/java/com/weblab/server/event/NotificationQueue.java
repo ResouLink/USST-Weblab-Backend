@@ -8,10 +8,10 @@ public class NotificationQueue {
     // 设置队列大小
     private static final int QUEUE_SIZE = 10000;
 
-    private static final LinkedBlockingQueue<Notification> blockingQueue = new LinkedBlockingQueue<>(QUEUE_SIZE);
+    private static final LinkedBlockingQueue<NotificationDto> blockingQueue = new LinkedBlockingQueue<>(QUEUE_SIZE);
 
     // 向队列中添加元素
-    public static boolean putNotification(Notification notification) {
+    public static boolean putNotification(NotificationDto notification) {
         try {
             blockingQueue.put(notification); // 阻塞方法
             return true;
@@ -22,7 +22,7 @@ public class NotificationQueue {
     }
 
     // 从队列中获取元素
-    public static Notification takeNotification() throws InterruptedException {
+    public static NotificationDto takeNotification() throws InterruptedException {
         return blockingQueue.take();
     }
 }

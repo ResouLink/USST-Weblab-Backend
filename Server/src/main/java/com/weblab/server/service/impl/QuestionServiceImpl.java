@@ -10,6 +10,7 @@ import com.weblab.server.entity.Notification;
 import com.weblab.server.entity.Question;
 import com.weblab.server.event.NotificationEvent;
 import com.weblab.server.event.NotificationListener;
+import com.weblab.server.event.NotificationType;
 import com.weblab.server.service.NotificationService;
 import com.weblab.server.service.QuestionService;
 import com.weblab.server.vo.CourseTeacherVO;
@@ -43,13 +44,12 @@ public class QuestionServiceImpl implements QuestionService {
         Question newQuestion = new Question();
         BeanUtils.copyProperties(questionDTO, newQuestion);
         questionDao.save(newQuestion);
-        Notification notification = new Notification();
         try {
-            notification = notificationService.addNotification(newQuestion, teacherCourseDao);
+            List<Notification> notificationList = notificationService.addNotification(newQuestion, teacherCourseDao);
+            applicationEventPublisher.publishEvent(new NotificationEvent(this, notificationList, NotificationType.QUESTION));
         } catch (Exception e) {
             log.warn("添加通知失败");
         }
-        applicationEventPublisher.publishEvent(new NotificationEvent(this, notification.getId()));
         log.info("问题添加成功");
     }
 

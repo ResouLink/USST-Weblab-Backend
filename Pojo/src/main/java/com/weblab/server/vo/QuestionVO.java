@@ -38,4 +38,9 @@ public class QuestionVO implements Serializable {
      * 提问者学生的主键
      */
     private long studentId;
+
+    /**
+     * 问题的回答列表
+     */
+    private List<Long> answerIds;
 }

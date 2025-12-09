@@ -16,5 +16,4 @@ public interface UserService {
     void deleteUser(long id);
     UserVO getUserById(long id);
     List<UserVO> getUsers(long page, long size, String keyword);
-    Users getUserByRoleId(long roleId, long id);
 }

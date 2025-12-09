@@ -6,13 +6,20 @@ import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.server.dao.AnswerDao;
 import com.weblab.server.dao.FileDao;
 import com.weblab.server.dao.FileListDao;
+import com.weblab.server.dao.QuestionDao;
 import com.weblab.server.dto.AnswerDTO;
 import com.weblab.server.entity.Answer;
+import com.weblab.server.entity.Notification;
+import com.weblab.server.entity.Question;
+import com.weblab.server.event.NotificationEvent;
+import com.weblab.server.event.NotificationType;
 import com.weblab.server.service.AnswerService;
+import com.weblab.server.service.NotificationService;
 import com.weblab.server.vo.AnswerVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +34,21 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerDao answerDao;
     private final FileListDao fileListDao;
     private final FileDao fileDao;
+    private final QuestionDao questionDao;
+    private final NotificationService notificationService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public void addAnswer(AnswerDTO answerDTO) {
         Answer newAnswer = new Answer();
         BeanUtils.copyProperties(answerDTO, newAnswer);
         answerDao.save(newAnswer);
+        try {
+            List<Notification> notificationList = notificationService.addNotification(newAnswer, questionDao);
+            applicationEventPublisher.publishEvent(new NotificationEvent(this, notificationList, NotificationType.ANSWER));
+        } catch (Exception e) {
+            log.warn("添加通知失败");
+        }
         //todo 添加回答成功应该将对应的问题的已回答标记打上
         log.info("答案添加成功");
     }

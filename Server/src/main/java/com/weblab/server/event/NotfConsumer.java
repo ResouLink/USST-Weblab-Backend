@@ -1,6 +1,7 @@
 package com.weblab.server.event;
 
-import com.weblab.server.entity.Notification;
+import cn.hutool.core.util.StrUtil;
+import com.weblab.server.dao.UserDao;
 import com.weblab.server.service.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -20,31 +21,31 @@ public class NotfConsumer implements Runnable {
     @Autowired
     @Qualifier("notificationExecutor")
     private ExecutorService notificationExecutor;
+    @Autowired
+    private UserDao userDao;
+
     @PostConstruct
-    public void init(){
+    public void init() {
         notificationExecutor.submit(this);
     }
 
-    public Notification consume() throws InterruptedException {
+    public NotificationDto consume() throws InterruptedException {
         return NotificationQueue.takeNotification();
     }
 
     @Override
     public void run() {
-        while(true){
+        while (true) {
             try {
-                Notification consumeNotification = consume();
+                NotificationDto consumeNotification = consume();
                 if (consumeNotification == null) {
                     continue;
                 }
-                // todo 获得发送用户
-
-//                userService.getUserByRoleId(consumeNotification.getUserRole(), consumeNotification.getStudentId());
-//                Boolean isSend = SseClient.sendMessage(loginUser, content);
-//                if (!isSend) {
-//                    log.info("消息推送失败，将消息重新放入队列重试！");
-//                    NotificationQueue.putNotification(consumeNotification);
-//                }
+                Boolean isSend = SseClient.sendMessage(StrUtil.toString(consumeNotification.getUser()), consumeNotification.getNotification().getContent());
+                if (!isSend) {
+                    log.info("消息推送失败，将消息重新放入队列重试！");
+                    NotificationQueue.putNotification(consumeNotification);
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;

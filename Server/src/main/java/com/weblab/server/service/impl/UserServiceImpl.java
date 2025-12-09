@@ -178,21 +178,4 @@ public class UserServiceImpl implements UserService {
         return voList;
     }
 
-    /**
-     * 通过角色id获取用户（studentId or teacherId）
-     *
-     * @param userRole
-     * @param roleId
-     * @return
-     */
-    @Override
-    public Users getUserByRoleId(long userRole, long roleId) {
-        if (userRole == 0) {
-            return userDao.query().eq("user_role", 0).eq("role_id", roleId).one();
-        } else if (userRole == 1) {
-            return userDao.query().eq("user_role", 1).eq("role_id", roleId).one();
-        }
-        return null;
-    }
-
 }
