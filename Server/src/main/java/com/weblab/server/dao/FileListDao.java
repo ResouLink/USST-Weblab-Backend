@@ -1,10 +1,8 @@
 package com.weblab.server.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.weblab.common.enums.FileRoleEnum;
-import com.weblab.common.enums.RoleEnum;
 import com.weblab.server.entity.FileList;
 import com.weblab.server.mapper.FileListMapper;
 import org.springframework.stereotype.Service;
@@ -50,8 +48,9 @@ public class FileListDao extends ServiceImpl<FileListMapper, FileList> {
                 .collect(Collectors.toList());
         this.saveBatch(fileLists);
     }
+
     public void deleteAllResourceFileList(Long resourceId) {
-        this.remove(new LambdaQueryWrapper<FileList>().eq(FileList::getNodeId, resourceId));
+        this.remove(new LambdaQueryWrapper<FileList>().eq(FileList::getNodeId, resourceId).eq(FileList::getFileRole, FileRoleEnum.RESOURCE.getFileRole()));
     }
 
     public List<Long> getResourceFileIds(Long resourceId) {
@@ -62,5 +61,32 @@ public class FileListDao extends ServiceImpl<FileListMapper, FileList> {
                 .stream()
                 .map(FileList::getFileId)
                 .collect(Collectors.toList());
+    }
+
+    public void setFiles(List<Long> fileIds, long fileRole, long nodeId) {
+        if (fileIds == null || fileIds.isEmpty()) {
+            return;
+        }
+
+        List<FileList> list = new ArrayList<>(fileIds.size());
+
+        for (Long fileId : fileIds) {
+            FileList fileList = new FileList();
+            fileList.setFileId(fileId);
+            fileList.setFileRole(fileRole);
+            fileList.setNodeId(nodeId);
+            list.add(fileList);
+        }
+
+        // MyBatis-Plus 批量保存
+        this.saveBatch(list);
+    }
+
+    public void deleteAllQuestionFileList(Long questionId) {
+        this.remove(new LambdaQueryWrapper<FileList>().eq(FileList::getNodeId, questionId).eq(FileList::getFileRole, FileRoleEnum.QUESTION.getFileRole()));
+    }
+
+    public void deleteAllAnswerFileList(Long answerId) {
+        this.remove(new LambdaQueryWrapper<FileList>().eq(FileList::getNodeId, answerId).eq(FileList::getFileRole, FileRoleEnum.ANSWER.getFileRole()));
     }
 }

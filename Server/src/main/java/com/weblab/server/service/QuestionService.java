@@ -12,4 +12,7 @@ public interface QuestionService {
     void deleteQuestion(long id);
     QuestionVO getQuestionById(long id);
     List<QuestionVO> getQuestions(long page, long size, String keyword);
+    List<QuestionVO> getQuestionsToBeAnswered(Long teacherId);
+    List<QuestionVO> getQuestionsRaisedByStudentId(Long studentId);
+    List<QuestionVO> getQuestionsByCourseId(Long courseId);
 }

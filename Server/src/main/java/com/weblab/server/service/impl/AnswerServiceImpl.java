@@ -1,6 +1,8 @@
 package com.weblab.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.enums.FileRoleEnum;
 import com.weblab.server.dao.AnswerDao;
@@ -26,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.weblab.common.enums.FileRoleEnum.ANSWER;
+
 @Slf4j
 @Service
 @Transactional
@@ -43,13 +47,19 @@ public class AnswerServiceImpl implements AnswerService {
         Answer newAnswer = new Answer();
         BeanUtils.copyProperties(answerDTO, newAnswer);
         answerDao.save(newAnswer);
+        fileListDao.setFiles(answerDTO.getFiles(),ANSWER.getFileRole(),newAnswer.getId());
+
         try {
             List<Notification> notificationList = notificationService.addNotification(newAnswer, questionDao);
             applicationEventPublisher.publishEvent(new NotificationEvent(this, notificationList, NotificationType.ANSWER));
         } catch (Exception e) {
             log.warn("添加通知失败");
         }
-        //todo 添加回答成功应该将对应的问题的已回答标记打上
+        //添加回答成功应该将对应的问题的已回答标记打上
+        questionDao.update(null, new LambdaUpdateWrapper<Question>()
+                .eq(Question::getId, newAnswer.getId())
+                .set(Question::getIsAnswered, 1));
+
         log.info("答案添加成功");
     }
 
@@ -63,8 +73,12 @@ public class AnswerServiceImpl implements AnswerService {
 
         BeanUtils.copyProperties(answerDTO, existing);
         existing.setId(id);
-
         boolean updated = answerDao.updateById(existing);
+
+        if(updated) {
+            fileListDao.deleteAllAnswerFileList(id);
+            fileListDao.setFiles(answerDTO.getFiles(),ANSWER.getFileRole(),existing.getId());
+        }
         if (!updated) {
             log.warn("答案更新失败");
             throw new RuntimeException("更新失败");
@@ -75,6 +89,8 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public void deleteAnswer(long id) {
         boolean removed = answerDao.removeById(id);
+        fileListDao.deleteAllAnswerFileList(id);
+
         if (!removed) {
             log.warn("答案删除失败");
             throw new RuntimeException("删除失败，答案不存在");
@@ -90,8 +106,7 @@ public class AnswerServiceImpl implements AnswerService {
             throw new RuntimeException("答案不存在");
         }
         
-        List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.ANSWER, id);
-//        List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
+        List<Long> fileIds = fileListDao.getFileIds(ANSWER, id);
         List<String> files = fileDao.getFileUrls(fileIds);
         
         AnswerVO vo = new AnswerVO();
@@ -112,8 +127,7 @@ public class AnswerServiceImpl implements AnswerService {
         Page<Answer> resultPage = answerDao.page(pageParam, queryWrapper);
 
         List<AnswerVO> voList = resultPage.getRecords().stream().map(answer -> {
-            List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.ANSWER, answer.getId());
-//            List<String> files = fileIds.stream().map(String::valueOf).collect(Collectors.toList());
+            List<Long> fileIds = fileListDao.getFileIds(ANSWER, answer.getId());
             List<String> files = fileDao.getFileUrls(fileIds);
 
             AnswerVO vo = new AnswerVO();
@@ -123,5 +137,29 @@ public class AnswerServiceImpl implements AnswerService {
         }).collect(Collectors.toList());
 
         return voList;
+    }
+
+    @Override
+    public List<AnswerVO> getAnswersByTeacherId(long teacherId) {
+
+        // 1️⃣ 直接查老师的回答
+        List<Answer> answers = answerDao.lambdaQuery()
+                .eq(Answer::getTeacherId, teacherId)
+                .list();
+
+        if (answers.isEmpty()) {
+            return List.of();
+        }
+
+        // 2️⃣ 组装 VO
+        return answers.stream().map(answer -> {
+            List<Long> fileIds = fileListDao.getFileIds(ANSWER, answer.getId());
+            List<String> files = fileDao.getFileUrls(fileIds);
+
+            AnswerVO vo = new AnswerVO();
+            BeanUtils.copyProperties(answer, vo);
+            vo.setFiles(files);
+            return vo;
+        }).toList();
     }
 }

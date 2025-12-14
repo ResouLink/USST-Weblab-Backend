@@ -30,4 +30,8 @@ public class Answer implements Serializable {
      * 老师表主键，回答问题的老师
      */
     private long teacherId;
+    /**
+     * 问题表主键，表示这个回答回答的是什么问题
+     */
+    private Long questionId;
 }

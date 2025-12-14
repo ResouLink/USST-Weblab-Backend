@@ -74,7 +74,7 @@ public class AnswerController {
     @GetMapping("/teachers/{teacher_id}")
     public  ApiResult getAnswersOfTeacher(@PathVariable("teacher_id") long teacherId) {
         try {
-
+            return ApiResult.success(answerService.getAnswersByTeacherId(teacherId));
         } catch (Exception e) {
             log.info("老师查询自己的回答失败",e);
             return ApiResult.fail(e.getMessage());

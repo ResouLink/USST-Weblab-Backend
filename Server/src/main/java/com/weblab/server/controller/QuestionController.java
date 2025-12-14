@@ -76,7 +76,7 @@ public class QuestionController {
     @GetMapping("/teachers/{teacher_id}")
     public ApiResult getQuestionsToBeAnswered(@PathVariable("teacher_id") long teacherId) {
         try {
-
+            return ApiResult.success(questionService.getQuestionsToBeAnswered(teacherId));
         } catch (Exception e) {
             log.info("查询待回答问题失败",e);
             return ApiResult.fail(e.getMessage());
@@ -86,7 +86,7 @@ public class QuestionController {
     @GetMapping("/students/{student_id}")
     public ApiResult getQuestionsOfStutents(@PathVariable("student_id") long studentId) {
         try {
-
+            return ApiResult.success(questionService.getQuestionsRaisedByStudentId(studentId));
         } catch (Exception e) {
             log.info("学生查询自己提问的问题失败",e);
             return ApiResult.fail(e.getMessage());
@@ -96,7 +96,7 @@ public class QuestionController {
     @GetMapping("/courses/{course_id}")
     public ApiResult getQuestionsByCourseId(@PathVariable("course_id") long courseId) {
         try {
-
+            return ApiResult.success(questionService.getQuestionsByCourseId(courseId));
         } catch (Exception e) {
             log.info("获取一个课程下的所有问题失败",e);
             return ApiResult.fail(e.getMessage());

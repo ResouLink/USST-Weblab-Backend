@@ -3,6 +3,7 @@ package com.weblab.server.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class QuestionDTO implements Serializable {
@@ -17,7 +18,7 @@ public class QuestionDTO implements Serializable {
     /**
      * 附件列表
      */
-    private long[] files;
+    private List<Long> files;
     /**
      * 提问者学生的主键
      */

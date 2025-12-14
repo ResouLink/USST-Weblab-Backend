@@ -11,4 +11,5 @@ public interface AnswerService {
     void deleteAnswer(long id);
     AnswerVO getAnswerById(long id);
     List<AnswerVO> getAnswers(long page, long size, String keyword);
+    List<AnswerVO> getAnswersByTeacherId(long teacherId);
 }
