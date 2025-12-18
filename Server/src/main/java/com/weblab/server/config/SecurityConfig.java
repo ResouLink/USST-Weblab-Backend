@@ -1,6 +1,5 @@
 package com.weblab.server.config;
 
-import com.weblab.server.security.CustomAuthenticationSuccessHandler;
 import com.weblab.server.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +16,6 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
-    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     //明文密码（你说不加密）
     @Bean

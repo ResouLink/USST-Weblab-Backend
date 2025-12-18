@@ -23,6 +23,7 @@ public class SseClient {
     public static SseEmitter connect(String userId) {
         if (!BeanUtil.isEmpty(sseEmitterMap.get(userId))) {
             // 已存在则返回
+            log.info("用户{}已存在连接", userId);
             return sseEmitterMap.get(userId);
         }
         SseEmitter sseEmitter = new SseEmitter(0L);
@@ -103,5 +104,14 @@ public class SseClient {
         sseEmitterMap.remove(userId);
         // 数量-1
         count.getAndDecrement();
+    }
+
+    public static boolean hasConnection(String userId) {
+        return sseEmitterMap.containsKey(userId);
+    }
+
+    // 获取连接数
+    public static int getConnectionCount() {
+        return count.get();
     }
 }
