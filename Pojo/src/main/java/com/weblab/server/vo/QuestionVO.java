@@ -43,4 +43,12 @@ public class QuestionVO implements Serializable {
      * 问题的回答列表
      */
     private List<Long> answerIds;
+    /**
+     * 提问者学生的姓名
+     */
+    private String studentName;
+    /**
+     * 问题所属于的课程名字
+     */
+    private String courseName;
 }

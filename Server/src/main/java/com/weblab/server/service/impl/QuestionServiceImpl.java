@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.server.dao.*;
 import com.weblab.server.dto.QuestionDTO;
-import com.weblab.server.entity.Notification;
-import com.weblab.server.entity.Question;
-import com.weblab.server.entity.TeacherCourse;
+import com.weblab.server.entity.*;
 import com.weblab.server.event.NotificationEvent;
 import com.weblab.server.event.NotificationType;
 import com.weblab.server.service.NotificationService;
@@ -37,6 +35,8 @@ public class QuestionServiceImpl implements QuestionService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final FileDao fileDao;
     private final AnswerDao answerDao;
+    private final StudentDao studentDao;
+    private final CourseDao courseDao;
 
     @Override
     @Transactional
@@ -109,11 +109,25 @@ public class QuestionServiceImpl implements QuestionService {
         List<Long> answerIdsByQuestionId = answerDao.getAnswerIdsByQuestionId(id);
 
 
+        //查找学生和课程名称
+        String studentName = studentDao.lambdaQuery()
+                .eq(Student::getId, question.getStudentId())
+                .select(Student::getName)
+                .one()
+                .getName();
+        String courseName = courseDao.lambdaQuery()
+                .eq(Course::getId, question.getCourseId())
+                .select(Course::getName)
+                .one()
+                .getName();
+
         //组装VO
         QuestionVO vo = new QuestionVO();
         BeanUtils.copyProperties(question, vo);
         vo.setFiles(files);
         vo.setAnswerIds(answerIdsByQuestionId);
+        vo.setStudentName(studentName);
+        vo.setCourseName(courseName);
         return vo;
     }
 
@@ -135,10 +149,25 @@ public class QuestionServiceImpl implements QuestionService {
 
             List<Long> answerIdsByQuestionId = answerDao.getAnswerIdsByQuestionId(question.getId());
 
+            //查找学生和课程名称
+            String studentName = studentDao.lambdaQuery()
+                    .eq(Student::getId, question.getStudentId())
+                    .select(Student::getName)
+                    .one()
+                    .getName();
+            String courseName = courseDao.lambdaQuery()
+                    .eq(Course::getId, question.getCourseId())
+                    .select(Course::getName)
+                    .one()
+                    .getName();
+
+
             QuestionVO vo = new QuestionVO();
             BeanUtils.copyProperties(question, vo);
             vo.setFiles(files);
             vo.setAnswerIds(answerIdsByQuestionId);
+            vo.setStudentName(studentName);
+            vo.setCourseName(courseName);
             return vo;
         }).collect(Collectors.toList());
 
@@ -163,9 +192,23 @@ public class QuestionServiceImpl implements QuestionService {
             List<Long> fileIds = fileListDao.getFileIds(QUESTION, question.getId());
             List<String> files = fileDao.getFileUrls(fileIds);
 
+            //查找学生和课程名称
+            String studentName = studentDao.lambdaQuery()
+                    .eq(Student::getId, question.getStudentId())
+                    .select(Student::getName)
+                    .one()
+                    .getName();
+            String courseName = courseDao.lambdaQuery()
+                    .eq(Course::getId, question.getCourseId())
+                    .select(Course::getName)
+                    .one()
+                    .getName();
+
             QuestionVO vo = new QuestionVO();
             BeanUtils.copyProperties(question, vo);
             vo.setFiles(files);
+            vo.setStudentName(studentName);
+            vo.setCourseName(courseName);
             return vo;
         }).toList();
 
@@ -184,10 +227,24 @@ public class QuestionServiceImpl implements QuestionService {
 
             List<Long> answerIdsByQuestionId = answerDao.getAnswerIdsByQuestionId(question.getId());
 
+            //查找学生和课程名称
+            String studentName = studentDao.lambdaQuery()
+                    .eq(Student::getId, question.getStudentId())
+                    .select(Student::getName)
+                    .one()
+                    .getName();
+            String courseName = courseDao.lambdaQuery()
+                    .eq(Course::getId, question.getCourseId())
+                    .select(Course::getName)
+                    .one()
+                    .getName();
+
             QuestionVO vo = new QuestionVO();
             BeanUtils.copyProperties(question, vo);
             vo.setFiles(files);
             vo.setAnswerIds(answerIdsByQuestionId);
+            vo.setStudentName(studentName);
+            vo.setCourseName(courseName);
             return vo;
         }).toList();
 
@@ -208,10 +265,24 @@ public class QuestionServiceImpl implements QuestionService {
 
             List<Long> answerIdsByQuestionId = answerDao.getAnswerIdsByQuestionId(question.getId());
 
+            //查找学生和课程名称
+            String studentName = studentDao.lambdaQuery()
+                    .eq(Student::getId, question.getStudentId())
+                    .select(Student::getName)
+                    .one()
+                    .getName();
+            String courseName = courseDao.lambdaQuery()
+                    .eq(Course::getId, question.getCourseId())
+                    .select(Course::getName)
+                    .one()
+                    .getName();
+
             QuestionVO vo = new QuestionVO();
             BeanUtils.copyProperties(question, vo);
             vo.setFiles(files);
             vo.setAnswerIds(answerIdsByQuestionId);
+            vo.setStudentName(studentName);
+            vo.setCourseName(courseName);
             return vo;
         }).toList();
 

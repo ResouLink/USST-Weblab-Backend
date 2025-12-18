@@ -30,4 +30,8 @@ public class AnswerVO implements Serializable {
      * 老师表主键，回答问题的老师
      */
     private long teacherId;
+    /**
+     * 老师姓名
+     */
+    private String teacherName;
 }

@@ -5,14 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.weblab.common.enums.FileRoleEnum;
-import com.weblab.server.dao.AnswerDao;
-import com.weblab.server.dao.FileDao;
-import com.weblab.server.dao.FileListDao;
-import com.weblab.server.dao.QuestionDao;
+import com.weblab.server.dao.*;
 import com.weblab.server.dto.AnswerDTO;
 import com.weblab.server.entity.Answer;
 import com.weblab.server.entity.Notification;
 import com.weblab.server.entity.Question;
+import com.weblab.server.entity.Teacher;
 import com.weblab.server.event.NotificationEvent;
 import com.weblab.server.event.NotificationType;
 import com.weblab.server.service.AnswerService;
@@ -41,6 +39,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final QuestionDao questionDao;
     private final NotificationService notificationService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final TeacherDao teacherDao;
 
     @Override
     public void addAnswer(AnswerDTO answerDTO) {
@@ -108,10 +107,14 @@ public class AnswerServiceImpl implements AnswerService {
         
         List<Long> fileIds = fileListDao.getFileIds(ANSWER, id);
         List<String> files = fileDao.getFileUrls(fileIds);
-        
+
+        //查找老师姓名
+        String teacherName = teacherDao.lambdaQuery().eq(Teacher::getId, answer.getTeacherId()).one().getName();
+
         AnswerVO vo = new AnswerVO();
         BeanUtils.copyProperties(answer, vo);
         vo.setFiles(files);
+        vo.setTeacherName(teacherName);
         return vo;
     }
 
@@ -130,9 +133,13 @@ public class AnswerServiceImpl implements AnswerService {
             List<Long> fileIds = fileListDao.getFileIds(ANSWER, answer.getId());
             List<String> files = fileDao.getFileUrls(fileIds);
 
+            //查找老师姓名
+            String teacherName = teacherDao.lambdaQuery().eq(Teacher::getId, answer.getTeacherId()).one().getName();
+
             AnswerVO vo = new AnswerVO();
             BeanUtils.copyProperties(answer, vo);
             vo.setFiles(files);
+            vo.setTeacherName(teacherName);
             return vo;
         }).collect(Collectors.toList());
 
@@ -156,9 +163,13 @@ public class AnswerServiceImpl implements AnswerService {
             List<Long> fileIds = fileListDao.getFileIds(ANSWER, answer.getId());
             List<String> files = fileDao.getFileUrls(fileIds);
 
+            //查找老师姓名
+            String teacherName = teacherDao.lambdaQuery().eq(Teacher::getId, answer.getTeacherId()).one().getName();
+
             AnswerVO vo = new AnswerVO();
             BeanUtils.copyProperties(answer, vo);
             vo.setFiles(files);
+            vo.setTeacherName(teacherName);
             return vo;
         }).toList();
     }
