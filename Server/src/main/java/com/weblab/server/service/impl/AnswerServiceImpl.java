@@ -49,7 +49,7 @@ public class AnswerServiceImpl implements AnswerService {
         fileListDao.setFiles(answerDTO.getFiles(),ANSWER.getFileRole(),newAnswer.getId());
 
         try {
-            List<Notification> notificationList = notificationService.addNotification(newAnswer, questionDao);
+            List<Notification> notificationList = notificationService.addNotification(newAnswer);
             applicationEventPublisher.publishEvent(new NotificationEvent(this, notificationList, NotificationType.ANSWER));
         } catch (Exception e) {
             log.warn("添加通知失败");

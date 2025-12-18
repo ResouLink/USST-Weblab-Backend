@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface NotificationService {
 
-    <T, D> List<Notification> addNotification(T t, D d) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException;
+    <T> List<Notification> addNotification(T t) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException;
 }

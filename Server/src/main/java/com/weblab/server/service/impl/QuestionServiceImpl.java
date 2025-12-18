@@ -45,14 +45,13 @@ public class QuestionServiceImpl implements QuestionService {
         BeanUtils.copyProperties(questionDTO, newQuestion);
         questionDao.save(newQuestion);
         //向附件表中添加关于回答问题的文件
-        fileListDao.setFiles(questionDTO.getFiles(),QUESTION.getFileRole(),newQuestion.getId());
+        fileListDao.setFiles(questionDTO.getFiles(), QUESTION.getFileRole(), newQuestion.getId());
         try {
-            List<Notification> notificationList = notificationService.addNotification(newQuestion, teacherCourseDao);
+            List<Notification> notificationList = notificationService.addNotification(newQuestion);
             applicationEventPublisher.publishEvent(new NotificationEvent(this, notificationList, NotificationType.QUESTION));
         } catch (Exception e) {
             log.warn("添加通知失败");
         }
-        log.info("问题添加成功");
     }
 
     @Override
@@ -71,7 +70,7 @@ public class QuestionServiceImpl implements QuestionService {
             //删除之前的记录
             fileListDao.deleteAllQuestionFileList(existing.getId());
             //添加新的fileList记录
-            fileListDao.setFiles(questionDTO.getFiles(),QUESTION.getFileRole(),existing.getId());
+            fileListDao.setFiles(questionDTO.getFiles(), QUESTION.getFileRole(), existing.getId());
         }
 
 

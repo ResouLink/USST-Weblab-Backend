@@ -1,6 +1,7 @@
 package com.weblab.server.event;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.weblab.common.exception.ServiceException;
 import com.weblab.server.dao.NotificationDao;
 import com.weblab.server.dao.UserDao;
@@ -41,7 +42,7 @@ public class NotificationListener implements ApplicationListener<NotificationEve
     public void putNotificationQueue(Long notificationId, NotificationType notificationType) {
         Notification notification = notificationDao.getById(notificationId);
         NotificationDto notificationDto = getNotificationDto(notification, notificationType);
-        if (BeanUtil.isEmpty(notification) || BeanUtil.isEmpty(notificationDto.getUser())) {
+        if (notification == null || notificationDto.getUser() == null) {
             log.error("通知不存在");
             return;
         }
@@ -54,13 +55,13 @@ public class NotificationListener implements ApplicationListener<NotificationEve
 
 
     public NotificationDto getNotificationDto(Notification notification, NotificationType notificationType) {
-        if (BeanUtil.isEmpty(notification) && notificationType != null) {
+        if (BeanUtil.isNotEmpty(notification) && notificationType != null) {
             NotificationDto notificationDto = new NotificationDto();
             // 获得通知用户
             if (notificationType == NotificationType.QUESTION) {
                 // 获得老师
                 Long teacherId = notification.getTeacherId();
-                Users user = userDao.query().eq("role_id", teacherId).eq("user_role", 0).one();
+                Users user = userDao.query().eq("role_id", StrUtil.toString(teacherId)).eq("user_role", 0).one();
                 notificationDto.setNotification(notification);
                 notificationDto.setUser(user.getId());
                 return notificationDto;

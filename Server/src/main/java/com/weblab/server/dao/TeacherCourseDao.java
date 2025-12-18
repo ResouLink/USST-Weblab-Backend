@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class TeacherCourseDao extends ServiceImpl<TeacherCourseMapper, TeacherCourse> {
-    List<Long> getByCourseId(long courseId){
+    public List<Long> getByCourseId(long courseId){
         return query().eq("course_id", courseId).list().stream().map(TeacherCourse::getTeacherId).toList();
     }
 }

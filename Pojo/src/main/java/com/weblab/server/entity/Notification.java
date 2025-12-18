@@ -38,4 +38,9 @@ public class Notification implements Serializable {
      * 通知发送者老师的主键
      */
     private long teacherId;
+
+    /**
+     * 问题id
+     */
+    private long questionId;
 }

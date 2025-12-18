@@ -3,6 +3,7 @@ package com.weblab.server.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import com.weblab.common.enums.RoleEnum;
 import com.weblab.server.dao.NotificationDao;
+import com.weblab.server.dao.QuestionDao;
 import com.weblab.server.dao.TeacherCourseDao;
 import com.weblab.server.dao.UserDao;
 import com.weblab.server.entity.Notification;
@@ -30,36 +31,37 @@ public class NotificationServiceImpl implements NotificationService {
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private final NotificationDao notificationDao;
     private final TeacherCourseDao teacherCourseDao;
-    private final UserDao userDao;
+    private final QuestionDao questionDao;
 
 
     /**
      * 添加通知
      *
      * @param t   问题或回答
-     * @param d   查询数据dao
      * @param <T>
-     * @param <D>
      * @return 添加成功与否
      */
     @Override
-    public <T, D> List<Notification> addNotification(T t, D d) {
+    public <T> List<Notification> addNotification(T t) {
         Class<?> tClass = t.getClass();
-        Class<?> dClass = d.getClass();
         try {
             Field contentField = tClass.getDeclaredField("content");
             // 爆破
             contentField.setAccessible(true);
             String content = (String) contentField.get(t);
+            boolean isQuestion = hasMethod(tClass, "getStudentId");
 
-            if (tClass.getMethod("getStudentId") != null) {
+            if (isQuestion) {
                 // t为问题
                 Long studentId = (Long) tClass.getMethod("getStudentId").invoke(t);
 
                 Field courseIdField = tClass.getDeclaredField("courseId");
-                contentField.setAccessible(true);
+                courseIdField.setAccessible(true);
                 Long courseId = (Long) courseIdField.get(t);
-                List<Long> teacherId = (List<Long>) dClass.getMethod("getByCourseId").invoke(d, courseId); // 获取对应授课的老师id列表
+                Field questionIdField = tClass.getDeclaredField("id");
+                questionIdField.setAccessible(true);
+                Long questionId = (Long) questionIdField.get(t);
+                List<Long> teacherId = teacherCourseDao.getByCourseId(courseId); // 获取对应授课的老师id列表
 
                 List<Notification> list = new ArrayList<>();
                 for (Long teacher : teacherId) {
@@ -68,6 +70,7 @@ public class NotificationServiceImpl implements NotificationService {
                     notification.setStudentId(studentId);
                     notification.setTeacherId(teacher);
                     notification.setStatus(0);
+                    notification.setQuestionId(questionId);
                     list.add(notification);
                 }
                 notificationDao.saveBatch(list);
@@ -76,21 +79,32 @@ public class NotificationServiceImpl implements NotificationService {
                 // t为回答
                 Long teacherId = (Long) tClass.getMethod("getTeacherId").invoke(t);
                 Field questionIdField = tClass.getDeclaredField("questionId");
-                contentField.setAccessible(true);
+                questionIdField.setAccessible(true);
                 Long questionId = (Long) questionIdField.get(t);
-                Question question = (Question) dClass.getMethod("getById").invoke(d, questionId);
+                Question question = questionDao.getById(questionId);
                 Long studentId = question.getStudentId(); // 获取学生id
                 Notification notification = new Notification();
                 notification.setContent(content);
                 notification.setTeacherId(teacherId);
                 notification.setStudentId(studentId);
+                notification.setQuestionId(questionId);
                 notification.setStatus(0);
                 notificationDao.save(notification);
                 return Collections.singletonList(notification);
             }
         } catch (NoSuchFieldException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             log.error("添加通知失败");
+            log.info("添加通知失败", e);
             return null;
+        }
+    }
+
+    private boolean hasMethod(Class<?> clazz, String methodName) {
+        try {
+            clazz.getMethod(methodName);
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
         }
     }
 

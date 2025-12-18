@@ -51,6 +51,7 @@ public class NotfConsumer implements Runnable {
                 Notification notification = consumeNotification.getNotification();
                 notification.setStatus(1);
                 notificationDao.updateById(notification);
+                log.info("消息推送成功！");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
