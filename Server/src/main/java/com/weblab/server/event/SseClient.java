@@ -45,8 +45,8 @@ public class SseClient {
     public static Boolean sendMessage(String userId, String message) {
         SseEmitter sseEmitter = sseEmitterMap.get(userId);
         if (sseEmitter == null) {
-            log.info("消息推送失败userId:[{}],没有创建连接，请重试。", userId);
-            return false;
+            log.info("消息推送失败userId:[{}],没有创建连接!", userId);
+            return true;
         }
         try {
             String eventId = userId + "-" + System.currentTimeMillis();
