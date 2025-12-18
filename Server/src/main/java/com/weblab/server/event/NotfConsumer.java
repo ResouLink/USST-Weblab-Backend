@@ -28,6 +28,7 @@ public class NotfConsumer implements Runnable {
     @PostConstruct
     public void init() {
         notificationExecutor.submit(this);
+        log.info("启动通知消费者线程！");
     }
 
     public NotificationDto consume() throws InterruptedException {
@@ -36,8 +37,9 @@ public class NotfConsumer implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
+                log.info("开始消费通知！");
                 NotificationDto consumeNotification = consume();
                 if (consumeNotification == null) {
                     continue;

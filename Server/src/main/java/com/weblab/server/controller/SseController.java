@@ -17,7 +17,7 @@ public class SseController {
     /**
      * SSE连接端点 - 由客户端主动调用
      */
-    @GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/connect")
     public SseEmitter connect(@RequestParam String userId) {
         // 这里可以添加额外的验证逻辑，比如验证token等
         return SseClient.connect(userId);

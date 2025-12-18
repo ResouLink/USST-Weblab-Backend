@@ -51,6 +51,7 @@ public class NotificationListener implements ApplicationListener<NotificationEve
             log.error("插入队列被打断");
             throw new ServiceException("插入队列被打断");
         }
+        log.info("插入队列成功");
     }
 
 

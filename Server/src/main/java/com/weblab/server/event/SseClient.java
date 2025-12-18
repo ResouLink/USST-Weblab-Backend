@@ -34,6 +34,7 @@ public class SseClient {
         sseEmitterMap.put(userId, sseEmitter);
         // 数量+1
         count.getAndIncrement();
+        log.info("用户{}连接成功，当前连接数：{}", userId, count.get());
         return sseEmitter;
     }
 
