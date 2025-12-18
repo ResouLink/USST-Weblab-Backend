@@ -1,7 +1,9 @@
 package com.weblab.server.event;
 
 import cn.hutool.core.util.StrUtil;
+import com.weblab.server.dao.NotificationDao;
 import com.weblab.server.dao.UserDao;
+import com.weblab.server.entity.Notification;
 import com.weblab.server.service.UserService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +18,12 @@ import java.util.concurrent.ExecutorService;
 public class NotfConsumer implements Runnable {
 
     @Autowired
-    private UserService userService;
+    private NotificationDao notificationDao;
 
     @Autowired
     @Qualifier("notificationExecutor")
     private ExecutorService notificationExecutor;
-    @Autowired
-    private UserDao userDao;
+
 
     @PostConstruct
     public void init() {
@@ -46,6 +47,10 @@ public class NotfConsumer implements Runnable {
                     log.info("消息推送失败，将消息重新放入队列重试！");
                     NotificationQueue.putNotification(consumeNotification);
                 }
+                // 通知成功， 设置通知为已通知
+                Notification notification = consumeNotification.getNotification();
+                notification.setStatus(1);
+                notificationDao.updateById(notification);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
