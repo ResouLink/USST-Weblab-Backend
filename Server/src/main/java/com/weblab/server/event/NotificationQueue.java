@@ -1,6 +1,5 @@
 package com.weblab.server.event;
 
-import com.weblab.server.entity.Notification;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.LinkedBlockingQueue;

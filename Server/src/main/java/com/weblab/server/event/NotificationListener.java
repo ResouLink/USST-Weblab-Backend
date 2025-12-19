@@ -35,12 +35,11 @@ public class NotificationListener implements ApplicationListener<NotificationEve
         List<Notification> notificationList = event.getNotificationList();
         NotificationType notificationType = event.getNotificationType();
         for (Notification notification : notificationList) {
-            putNotificationQueue(notification.getId(), notificationType);
+            putNotificationQueue(notification, notificationType);
         }
     }
 
-    public void putNotificationQueue(Long notificationId, NotificationType notificationType) {
-        Notification notification = notificationDao.getById(notificationId);
+    public void putNotificationQueue(Notification notification, NotificationType notificationType) {
         NotificationDto notificationDto = getNotificationDto(notification, notificationType);
         if (notification == null || notificationDto.getUser() == null) {
             log.error("通知不存在");
@@ -70,7 +69,7 @@ public class NotificationListener implements ApplicationListener<NotificationEve
             } else if (notificationType == NotificationType.ANSWER) {
                 // 获得学生
                 long studentId = notification.getStudentId();
-                Users user = userDao.query().eq("role_id", studentId).eq("user_role", 1).one();
+                Users user = userDao.query().eq("role_id", StrUtil.toString(studentId)).eq("user_role", 1).one();
                 notificationDto.setNotification(notification);
                 notificationDto.setUser(user.getId());
                 return notificationDto;

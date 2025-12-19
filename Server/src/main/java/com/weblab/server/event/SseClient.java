@@ -31,6 +31,12 @@ public class SseClient {
         sseEmitter.onCompletion(completionCallBack(userId));
         sseEmitter.onError(errorCallBack(userId));
         sseEmitter.onTimeout(timeoutCallBack(userId));
+
+        try {
+            sseEmitter.send(SseEmitter.event().reconnectTime(5000));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         sseEmitterMap.put(userId, sseEmitter);
         // 数量+1
         count.getAndIncrement();
@@ -55,7 +61,7 @@ public class SseClient {
             sseEmitter.send(SseEmitter.event()
                     .id(eventId)
                     .reconnectTime(3*1000L)
-                    .data(message), MediaType.APPLICATION_JSON);
+                    .data(message));
             return true;
         } catch (IOException e) {
             log.error("发送消息失败", e);
@@ -86,7 +92,7 @@ public class SseClient {
                 try {
                     sseEmitter.send(SseEmitter.event()
                             .name("error")
-                            .data("连接发生异常: " + throwable.getMessage()) + "，请重试！");
+                            .data("连接发生异常: " + throwable.getMessage() + "，请重试！"));
                 } catch (IOException e) {
                     log.error("发送错误消息失败", e);
                 }
@@ -105,6 +111,7 @@ public class SseClient {
         sseEmitterMap.remove(userId);
         // 数量-1
         count.getAndDecrement();
+        log.info("用户{}连接已关闭，当前连接数：{}", userId, count.get());
     }
 
     public static boolean hasConnection(String userId) {

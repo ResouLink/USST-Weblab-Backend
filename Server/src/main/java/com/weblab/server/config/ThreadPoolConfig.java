@@ -17,7 +17,7 @@ public class ThreadPoolConfig {
 
     @Bean(NOTIFICATION_EXECUTOR)
     public ExecutorService notificationExecutor() {
-        return Executors.newSingleThreadExecutor(); // 后续可以改
+        return Executors.newSingleThreadExecutor();
     }
 
     @Bean("taskExecutor")
