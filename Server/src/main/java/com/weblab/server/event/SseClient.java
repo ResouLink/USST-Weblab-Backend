@@ -21,11 +21,11 @@ public class SseClient {
     private static final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
     public static SseEmitter connect(String userId) {
-        if (!BeanUtil.isEmpty(sseEmitterMap.get(userId))) {
-            // 已存在则返回
-            log.info("用户{}已存在连接", userId);
-            return sseEmitterMap.get(userId);
-        }
+//        if (!BeanUtil.isEmpty(sseEmitterMap.get(userId))) {
+//             已存在则返回
+//            log.info("用户{}已存在连接", userId);
+//            return sseEmitterMap.get(userId);
+//        }
         SseEmitter sseEmitter = new SseEmitter(0L);
         // 注册回调
         sseEmitter.onCompletion(completionCallBack(userId));
@@ -64,6 +64,7 @@ public class SseClient {
                     .data(message));
             return true;
         } catch (IOException e) {
+            removeUser(userId);
             log.error("发送消息失败", e);
             return false;
         }
@@ -90,11 +91,19 @@ public class SseClient {
             SseEmitter sseEmitter = sseEmitterMap.get(userId);
             if (sseEmitter != null) {
                 try {
+                    String errorMessage = "连接发生异常，请重试！";
                     sseEmitter.send(SseEmitter.event()
                             .name("error")
-                            .data("连接发生异常: " + throwable.getMessage() + "，请重试！"));
+                            .data(errorMessage));
                 } catch (IOException e) {
                     log.error("发送错误消息失败", e);
+                } finally {
+                    // 确保资源被正确释放
+                    try {
+                        sseEmitter.complete();
+                    } catch (Exception e) {
+                        log.debug("SSE emitter completion failed", e);
+                    }
                 }
             }
             log.info("sse 连接异常：{}", userId);
@@ -106,12 +115,24 @@ public class SseClient {
     public static void removeUser(String userId) {
         SseEmitter emitter = sseEmitterMap.get(userId);
         if (emitter != null) {
-            emitter.complete();
+            try {
+                emitter.complete();
+                // 数量-1
+                count.getAndDecrement();
+                log.info("用户{}连接已关闭，当前连接数：{}", userId, count.get());
+            } catch (IllegalStateException e) {
+                // emitter可能已经完成或超时
+                log.warn("用户{}的SSE连接已完成或超时: {}", userId, e.getMessage());
+                // 仍然需要递减计数器，因为用户已被移除
+                count.getAndDecrement();
+                log.info("用户{}连接已关闭，当前连接数：{}", userId, count.get());
+            } catch (Exception e) {
+                log.error("关闭用户{}的SSE连接时发生错误", userId, e);
+                // 仍然需要递减计数器，因为用户已被移除
+                count.getAndDecrement();
+                log.info("用户{}连接已关闭，当前连接数：{}", userId, count.get());
+            }
         }
-        sseEmitterMap.remove(userId);
-        // 数量-1
-        count.getAndDecrement();
-        log.info("用户{}连接已关闭，当前连接数：{}", userId, count.get());
     }
 
     public static boolean hasConnection(String userId) {
