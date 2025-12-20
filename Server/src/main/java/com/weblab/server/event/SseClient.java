@@ -2,13 +2,14 @@ package com.weblab.server.event;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -20,61 +21,76 @@ public class SseClient {
     // 存储所有连接的sseEmitter
     private static final Map<String, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();
 
-    public static SseEmitter connect(String userId) {
-//        if (!BeanUtil.isEmpty(sseEmitterMap.get(userId))) {
-//             已存在则返回
-//            log.info("用户{}已存在连接", userId);
-//            return sseEmitterMap.get(userId);
-//        }
-        SseEmitter sseEmitter = new SseEmitter(0L);
-        // 注册回调
-        sseEmitter.onCompletion(completionCallBack(userId));
-        sseEmitter.onError(errorCallBack(userId));
-        sseEmitter.onTimeout(timeoutCallBack(userId));
+    /**
+     * 发送心跳线程池
+     */
+    private static ScheduledExecutorService heartbeatExecutors = Executors.newScheduledThreadPool(8);
 
+    public static SseEmitter connect(String userId) {
+        SseEmitter haveSseEmitter = sseEmitterMap.get(userId);
+        if (haveSseEmitter != null) {
+//             已存在则返回
+            log.info("用户{}已存在连接", userId);
+            try {
+                haveSseEmitter.send(SseEmitter.event().comment(""));
+                log.info("用户{}已连接成功", userId);
+                return haveSseEmitter;
+            } catch (IOException e) {
+                log.error("连接已失效", e);
+                removeUser(userId);
+            }
+        }
+        SseEmitter sseEmitter = new SseEmitter(0L);
         try {
-            sseEmitter.send(SseEmitter.event().reconnectTime(5000));
+            sseEmitter.send(SseEmitter.event().reconnectTime(1000));
         } catch (IOException e) {
             e.printStackTrace();
         }
         sseEmitterMap.put(userId, sseEmitter);
         // 数量+1
         count.getAndIncrement();
+
+        final ScheduledFuture<?> future = heartbeatExecutors.scheduleAtFixedRate(new HeartBeatTask(userId), 0, 1, TimeUnit.SECONDS);
+        // 注册回调
+        sseEmitter.onCompletion(completionCallBack(userId,  future));
+        sseEmitter.onError(errorCallBack(userId));
+        sseEmitter.onTimeout(timeoutCallBack(userId));
+
         log.info("用户{}连接成功，当前连接数：{}", userId, count.get());
         return sseEmitter;
     }
 
     /**
      * 给指定用户发送消息
+     *
      * @param userId
      * @param message
      * @return
      */
-    public static Boolean sendMessage(String userId, String message) {
+    public static Boolean sendMessage(String userId, String message) throws IOException {
         SseEmitter sseEmitter = sseEmitterMap.get(userId);
         if (sseEmitter == null) {
             log.info("消息推送失败userId:[{}],没有创建连接!", userId);
-            return true;
-        }
-        try {
-            String eventId = userId + "-" + System.currentTimeMillis();
-            sseEmitter.send(SseEmitter.event()
-                    .id(eventId)
-                    .reconnectTime(3*1000L)
-                    .data(message));
-            return true;
-        } catch (IOException e) {
-            removeUser(userId);
-            log.error("发送消息失败", e);
             return false;
         }
+
+        String eventId = userId + "-" + System.currentTimeMillis();
+        sseEmitter.send(SseEmitter.event()
+                .id(eventId)
+                .reconnectTime(3 * 1000L)
+                .data(message));
+        return true;
+
     }
 
 
-    private static Runnable completionCallBack(String userId) {
+    private static Runnable completionCallBack(String userId, ScheduledFuture<?>  future) {
         return () -> {
             log.info("结束 sse 连接：{}", userId);
             removeUser(userId);
+            if (future != null) {
+                future.cancel(true);
+            }
         };
     }
 
@@ -106,31 +122,25 @@ public class SseClient {
                     }
                 }
             }
-            log.info("sse 连接异常：{}", userId);
             removeUser(userId);
         };
     }
 
 
     public static void removeUser(String userId) {
-        SseEmitter emitter = sseEmitterMap.get(userId);
+        SseEmitter emitter = sseEmitterMap.remove(userId);
         if (emitter != null) {
             try {
                 emitter.complete();
-                // 数量-1
-                count.getAndDecrement();
-                log.info("用户{}连接已关闭，当前连接数：{}", userId, count.get());
-            } catch (IllegalStateException e) {
-                // emitter可能已经完成或超时
-                log.warn("用户{}的SSE连接已完成或超时: {}", userId, e.getMessage());
-                // 仍然需要递减计数器，因为用户已被移除
-                count.getAndDecrement();
-                log.info("用户{}连接已关闭，当前连接数：{}", userId, count.get());
             } catch (Exception e) {
-                log.error("关闭用户{}的SSE连接时发生错误", userId, e);
-                // 仍然需要递减计数器，因为用户已被移除
-                count.getAndDecrement();
-                log.info("用户{}连接已关闭，当前连接数：{}", userId, count.get());
+                log.debug("用户{}连接完成异常: {}", userId, e.getMessage());
+            }
+
+            // 更新计数器
+            int current = count.decrementAndGet();
+            if (current < 0) {
+                count.set(0); // 防止负数
+                log.warn("连接计数器出现负数，已重置为0");
             }
         }
     }

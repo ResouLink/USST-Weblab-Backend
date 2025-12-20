@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -30,7 +31,11 @@ public class SseController {
     public String sendMessage(
             @PathVariable String userId,
             @RequestBody MessageRequest request) {
-        SseClient.sendMessage(userId, request.getContent());
+        try {
+            SseClient.sendMessage(userId, request.getContent());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return "消息已发送";
     }
 

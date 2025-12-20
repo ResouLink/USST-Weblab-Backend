@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 @Slf4j
@@ -45,10 +46,16 @@ public class NotfConsumer implements Runnable, DisposableBean {
                 if (notificationDto == null) {
                     continue;
                 }
-                Boolean isSend = SseClient.sendMessage(StrUtil.toString(notificationDto.getUser()), notificationDto.getNotification().getContent());
-                if (!isSend) {
-                    log.info("消息推送失败，将消息重新放入队列重试！");
-                    retry(notificationDto);
+                Boolean isSend = null;
+                try {
+                    isSend = SseClient.sendMessage(StrUtil.toString(notificationDto.getUser()), notificationDto.getNotification().getContent());
+                } catch (IOException e) {
+                    log.error("消息推送失败，将消息重新放入队列重试！");
+                    NotificationQueue.putNotification(notificationDto);
+                    continue;
+                }
+                if (Boolean.FALSE.equals(isSend)) {
+                    continue;
                 }
                 // 通知成功， 设置通知为已通知
                 Notification notification = notificationDto.getNotification();
@@ -60,23 +67,6 @@ public class NotfConsumer implements Runnable, DisposableBean {
                 break;
             }
         }
-    }
-
-    private void retry(NotificationDto notificationDto) {
-        int retryCount = 3;
-        while (retryCount > 0) {
-            log.info("消息推送失败，将消息重新放入队列重试！");
-            boolean isTrue = NotificationQueue.putNotification(notificationDto);
-            if (isTrue) {
-                log.info("消息推送成功！");
-                return;
-            }
-            retryCount--;
-        }
-        log.error("通知已达最大重试次数，丢弃该通知，用户={}, 内容={}",
-                notificationDto.getUser(),
-                notificationDto.getNotification().getContent());
-
     }
 
     @Override
