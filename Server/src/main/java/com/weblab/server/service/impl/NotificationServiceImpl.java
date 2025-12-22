@@ -1,22 +1,18 @@
 package com.weblab.server.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import com.weblab.common.enums.RoleEnum;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.weblab.server.dao.NotificationDao;
 import com.weblab.server.dao.QuestionDao;
 import com.weblab.server.dao.TeacherCourseDao;
 import com.weblab.server.dao.UserDao;
 import com.weblab.server.entity.Notification;
 import com.weblab.server.entity.Question;
-import com.weblab.server.entity.TeacherCourse;
 import com.weblab.server.entity.Users;
-import com.weblab.server.event.NotificationDto;
-import com.weblab.server.event.NotificationType;
+import com.weblab.server.event.SseClient;
 import com.weblab.server.service.NotificationService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -24,21 +20,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Service
+@Slf4j
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
-    private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
     private final NotificationDao notificationDao;
     private final TeacherCourseDao teacherCourseDao;
     private final QuestionDao questionDao;
+    private final UserDao userDao;
 
 
     /**
      * 添加通知
      *
-     * @param t   问题或回答
-     * @param <T>
+     * @param t 问题或回答
      * @return 添加成功与否
      */
     @Override
@@ -61,19 +57,40 @@ public class NotificationServiceImpl implements NotificationService {
                 Field questionIdField = tClass.getDeclaredField("id");
                 questionIdField.setAccessible(true);
                 Long questionId = (Long) questionIdField.get(t);
-                List<Long> teacherId = teacherCourseDao.getByCourseId(courseId); // 获取对应授课的老师id列表
+                List<Long> teacherIds = teacherCourseDao.getByCourseId(courseId); // 获取对应授课的老师id列表
 
                 List<Notification> list = new ArrayList<>();
-                for (Long teacher : teacherId) {
+                for (Long teacherId : teacherIds) {
                     Notification notification = new Notification();
                     notification.setContent(content);
                     notification.setStudentId(studentId);
-                    notification.setTeacherId(teacher);
+                    notification.setTeacherId(teacherId);
                     notification.setStatus(0);
                     notification.setQuestionId(questionId);
+
+                    // 先保存到数据库
+                    notificationDao.save(notification);
                     list.add(notification);
+
+                    // 检查教师是否在线，在线则通过 SSE 推送
+                    try {
+                        Users teacherUser = userDao.getOne(
+                                new LambdaQueryWrapper<Users>()
+                                        .eq(Users::getRoleId, teacherId)
+                                        .eq(Users::getUserRole, 0L)
+                        );
+
+                        if (teacherUser != null && SseClient.hasConnection(String.valueOf(teacherUser.getId()))) {
+                            SseClient.sendMessage(String.valueOf(teacherUser.getId()),
+                                    "学生提问: " + content);
+                            // 推送成功，更新状态为已推送
+                            notification.setStatus(1);
+                            notificationDao.updateById(notification);
+                        }
+                    } catch (Exception e) {
+                        log.warn("SSE推送失败，通知已保存到数据库: {}", e.getMessage());
+                    }
                 }
-                notificationDao.saveBatch(list);
                 return list;
             } else {
                 // t为回答
@@ -89,14 +106,99 @@ public class NotificationServiceImpl implements NotificationService {
                 notification.setStudentId(studentId);
                 notification.setQuestionId(questionId);
                 notification.setStatus(0);
+
+                // 先保存到数据库
                 notificationDao.save(notification);
+
+                // 检查学生是否在线，在线则通过 SSE 推送
+                try {
+                    Users studentUser = userDao.getOne(
+                            new LambdaQueryWrapper<Users>()
+                                    .eq(Users::getRoleId, studentId)
+                                    .eq(Users::getUserRole, 1L)
+                    );
+
+                    if (studentUser != null && SseClient.hasConnection(String.valueOf(studentUser.getId()))) {
+                        SseClient.sendMessage(String.valueOf(studentUser.getId()),
+                                "教师回答: " + content);
+                        notificationDao.updateById(notification);
+                    }
+                } catch (Exception e) {
+                    log.warn("SSE推送失败，通知已保存到数据库: {}", e.getMessage());
+                }
+
                 return Collections.singletonList(notification);
             }
         } catch (NoSuchFieldException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            log.error("添加通知失败");
-            log.info("添加通知失败", e);
+            log.error("添加通知失败", e);
             return null;
         }
+    }
+
+    /**
+     * 获取用户未读通知数量
+     */
+    @Override
+    public long getUnreadCount(Long userId) {
+        if (userId == null) {
+            return 0;
+        }
+        return notificationDao.count(new LambdaQueryWrapper<Notification>()
+                .eq(Notification::getStudentId, userId)
+                .eq(Notification::getStatus, 0));
+    }
+
+    /**
+     * 获取用户的通知列表
+     * @param userId 用户ID
+     * @param status 状态：null表示所有，0表示未读，1表示已读
+     */
+    @Override
+    public List<Notification> getNotificationsByUserId(Long userId, Integer status) {
+        if (userId == null) {
+            return Collections.emptyList();
+        }
+
+        LambdaQueryWrapper<Notification> wrapper = new LambdaQueryWrapper<Notification>()
+                .eq(Notification::getStudentId, userId)
+                .orderByDesc(Notification::getId);
+
+        if (status != null) {
+            wrapper.eq(Notification::getStatus, status);
+        }
+
+        return notificationDao.list(wrapper);
+    }
+
+    /**
+     * 标记单条通知为已读
+     */
+    @Override
+    public void markAsRead(Long notificationId) {
+        if (notificationId == null) {
+            return;
+        }
+        Notification notification = notificationDao.getById(notificationId);
+        if (notification != null && notification.getStatus() == 0) {
+            notification.setStatus(1);
+            notificationDao.updateById(notification);
+            log.info("通知{}已标记为已读", notificationId);
+        }
+    }
+
+    /**
+     * 标记用户的所有通知为已读
+     */
+    @Override
+    public void markAllAsRead(Long userId) {
+        if (userId == null) {
+            return;
+        }
+        notificationDao.update(null, new LambdaUpdateWrapper<Notification>()
+                .eq(Notification::getStudentId, userId)
+                .eq(Notification::getStatus, 0)
+                .set(Notification::getStatus, 1));
+        log.info("用户{}的所有通知已标记为已读", userId);
     }
 
     private boolean hasMethod(Class<?> clazz, String methodName) {

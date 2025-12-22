@@ -32,22 +32,64 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void addCourse(CourseDTO courseDTO) {
+        // 参数合法性检查
+        if (courseDTO == null) {
+            log.warn("课程数据为空");
+            throw new RuntimeException("课程数据不能为空");
+        }
+
+        // 检查 name 字段
+        if (courseDTO.getName() == null || courseDTO.getName().trim().isEmpty()) {
+            log.warn("课程名称不能为空");
+            throw new RuntimeException("课程名称不能为空");
+        }
+
+        // 检查 description 字段
+        if (courseDTO.getDescription() == null || courseDTO.getDescription().trim().isEmpty()) {
+            log.warn("课程描述不能为空");
+            throw new RuntimeException("课程描述不能为空");
+        }
+
+        // 检查 college 字段
+        if (courseDTO.getCollege() == null || courseDTO.getCollege().trim().isEmpty()) {
+            log.warn("开设学院不能为空");
+            throw new RuntimeException("开设学院不能为空");
+        }
+
+        // 检查 teachers_id 字段
+        if (courseDTO.getTeachersId() == null) {
+            log.warn("教师ID数组不能为空");
+            throw new RuntimeException("教师ID数组不能为空");
+        }
+
+        if (courseDTO.getTeachersId().isEmpty()) {
+            log.warn("教师ID数组不能为空");
+            throw new RuntimeException("教师ID数组不能为空");
+        }
+
+        // 检查数组元素是否为整数（Long类型）
+        for (Long teacherId : courseDTO.getTeachersId()) {
+            if (teacherId == null) {
+                log.warn("教师ID不能为空");
+                throw new RuntimeException("教师ID不能为空");
+            }
+        }
+
+        // 开始保存课程
         Course newCourse = new Course();
         BeanUtils.copyProperties(courseDTO, newCourse);
         courseDao.save(newCourse);
         
         // 添加教师关系
-        if (courseDTO.getTeachersId() != null && !courseDTO.getTeachersId().isEmpty()) {
-            for (Long teacherId : courseDTO.getTeachersId()) {
-                if (teacherDao.getById(teacherId) == null) {
-                    log.warn("教师不存在, ID: {}", teacherId);
-                    throw new RuntimeException("教师ID不存在: " + teacherId);
-                }
-                TeacherCourse teacherCourse = new TeacherCourse();
-                teacherCourse.setCourseId(newCourse.getId());
-                teacherCourse.setTeacherId(teacherId);
-                teacherCourseDao.save(teacherCourse);
+        for (Long teacherId : courseDTO.getTeachersId()) {
+            if (teacherDao.getById(teacherId) == null) {
+                log.warn("教师不存在, ID: {}", teacherId);
+                throw new RuntimeException("教师ID不存在: " + teacherId);
             }
+            TeacherCourse teacherCourse = new TeacherCourse();
+            teacherCourse.setCourseId(newCourse.getId());
+            teacherCourse.setTeacherId(teacherId);
+            teacherCourseDao.save(teacherCourse);
         }
         log.info("课程添加成功");
     }

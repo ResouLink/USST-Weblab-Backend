@@ -1,7 +1,9 @@
 package com.weblab.server.event;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -26,6 +28,14 @@ public class SseClient {
      */
     private static ScheduledExecutorService heartbeatExecutors = Executors.newScheduledThreadPool(8);
 
+    // 存储 NotificationService 的静态引用
+    private static com.weblab.server.service.NotificationService notificationService;
+
+    @Autowired
+    public void setNotificationService(com.weblab.server.service.NotificationService service) {
+        notificationService = service;
+    }
+
     public static SseEmitter connect(String userId) {
         SseEmitter haveSseEmitter = sseEmitterMap.get(userId);
         if (haveSseEmitter != null) {
@@ -49,6 +59,31 @@ public class SseClient {
         sseEmitterMap.put(userId, sseEmitter);
         // 数量+1
         count.getAndIncrement();
+
+        // 发送未读通知数量提示
+        try {
+            Long userIdLong = Long.parseLong(userId);
+            long unreadCount = 0;
+            if (notificationService != null) {
+                unreadCount = notificationService.getUnreadCount(userIdLong);
+            }
+
+            // 构建通知提示消息
+            Map<String, Object> unreadMessage = new HashMap<>();
+            unreadMessage.put("type", "unreadCount");
+            unreadMessage.put("count", unreadCount);
+
+            String eventId = userId + "-" + System.currentTimeMillis();
+            sseEmitter.send(SseEmitter.event()
+                    .id(eventId)
+                    .name("unreadNotification")
+                    .reconnectTime(3 * 1000L)
+                    .data(cn.hutool.json.JSONUtil.toJsonStr(unreadMessage)));
+
+            log.info("用户{}连接时发送未读通知数: {}", userId, unreadCount);
+        } catch (Exception e) {
+            log.warn("发送未读通知数失败: {}", e.getMessage());
+        }
 
         final ScheduledFuture<?> future = heartbeatExecutors.scheduleAtFixedRate(new HeartBeatTask(userId), 0, 1, TimeUnit.SECONDS);
         // 注册回调
