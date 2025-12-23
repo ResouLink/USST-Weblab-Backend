@@ -59,7 +59,7 @@ public class NotfConsumer implements Runnable, DisposableBean {
                 }
                 // 通知成功， 设置通知为已通知
                 Notification notification = notificationDto.getNotification();
-                notification.setStatus(1);
+//                notification.setStatus(1);
                 notificationDao.updateById(notification);
                 log.info("消息推送成功！");
             } catch (InterruptedException e) {

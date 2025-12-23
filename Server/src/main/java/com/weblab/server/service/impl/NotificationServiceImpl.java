@@ -71,25 +71,6 @@ public class NotificationServiceImpl implements NotificationService {
                     // 先保存到数据库
                     notificationDao.save(notification);
                     list.add(notification);
-
-                    // 检查教师是否在线，在线则通过 SSE 推送
-                    try {
-                        Users teacherUser = userDao.getOne(
-                                new LambdaQueryWrapper<Users>()
-                                        .eq(Users::getRoleId, teacherId)
-                                        .eq(Users::getUserRole, 0L)
-                        );
-
-                        if (teacherUser != null && SseClient.hasConnection(String.valueOf(teacherUser.getId()))) {
-                            SseClient.sendMessage(String.valueOf(teacherUser.getId()),
-                                    "学生提问: " + content);
-                            // 推送成功，更新状态为已推送
-                            notification.setStatus(1);
-                            notificationDao.updateById(notification);
-                        }
-                    } catch (Exception e) {
-                        log.warn("SSE推送失败，通知已保存到数据库: {}", e.getMessage());
-                    }
                 }
                 return list;
             } else {
