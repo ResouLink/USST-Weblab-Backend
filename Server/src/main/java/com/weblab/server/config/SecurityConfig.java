@@ -81,7 +81,7 @@ public class SecurityConfig {
                         // 学生注册
                         .requestMatchers(HttpMethod.POST, "/api/users/students").permitAll()
                         // 登录 & 注册接口
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/api/login").permitAll()
 
                         // 业务接口必须登录
                         .requestMatchers("/api/**").authenticated()
