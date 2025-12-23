@@ -27,4 +27,8 @@ public class FileVO implements java.io.Serializable {
      * 文件类型
      */
     private String fileType;
+    /**
+     * 文件url
+     */
+    private String fileUrl;
 }

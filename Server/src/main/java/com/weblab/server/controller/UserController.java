@@ -3,6 +3,7 @@ package com.weblab.server.controller;
 import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.UserRegisterDTO;
 import com.weblab.server.dto.UserUpdateDTO;
+import com.weblab.server.security.SecurityUtil;
 import com.weblab.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,9 @@ public class UserController {
     }
     @PutMapping("/{id}")
     public ApiResult updateUser(@RequestBody UserUpdateDTO userUpdateDTO, @PathVariable("id") long id) {
-
+        if(id == -1) {
+            id = SecurityUtil.getUserId();
+        }
         userService.updateUser(userUpdateDTO, id);
         return ApiResult.success("1");
     }
@@ -40,7 +43,9 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ApiResult getUser(@PathVariable long id) {
-
+        if(id == -1) {
+            id = SecurityUtil.getUserId();
+        }
         return ApiResult.success(userService.getUserById(id));
     }
     @GetMapping

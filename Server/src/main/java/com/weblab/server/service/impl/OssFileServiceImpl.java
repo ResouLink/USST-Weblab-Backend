@@ -43,6 +43,7 @@ public class OssFileServiceImpl implements OssFileService {
                     .fileType(fileInfo.getFileType())
                     .fileSize(fileInfo.getFileSize())
                     .fileName(originalFilename)
+                    .fileUrl(filePath)
                     .build();
 
             log.info("文件上传成功, 文件ID: {}", fileInfo.getId());
