@@ -96,7 +96,7 @@ public class SecurityConfig {
                 // 5️⃣ ⭐⭐⭐ 开启表单登录（解决 /login 404 的关键）
                 .formLogin(form -> form
                         // 前端 POST 的地址
-                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/api/login")
 
                         // 登录成功
                         .successHandler((request, response, authentication) -> {
@@ -150,7 +150,7 @@ public class SecurityConfig {
 
                 // 7️⃣ 退出登录
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
+                        .logoutUrl("/api/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter()
