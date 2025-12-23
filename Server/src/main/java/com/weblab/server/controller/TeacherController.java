@@ -69,7 +69,7 @@ public class TeacherController {
     }
 
     @GetMapping
-    public ApiResult getTeachers(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
+    public ApiResult getTeachers(@RequestParam long page, @RequestParam long size, @RequestParam(required = false) String keyword) {
         try {
             return ApiResult.success(teacherService.getTeachers(page, size, keyword));
         } catch (Exception e) {

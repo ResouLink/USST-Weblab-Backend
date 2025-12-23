@@ -61,7 +61,7 @@ public class ResourcesController {
     }
 
     @GetMapping()
-    public ApiResult getResources(@RequestParam long page,@RequestParam long size,@RequestParam String keyword) {
+    public ApiResult getResources(@RequestParam long page,@RequestParam long size,@RequestParam(required = false) String keyword) {
         try {
             return ApiResult.success(resourceService.getResources(page,size,keyword));
         } catch (Exception e) {

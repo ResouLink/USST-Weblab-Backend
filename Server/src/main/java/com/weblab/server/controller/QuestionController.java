@@ -63,7 +63,7 @@ public class QuestionController {
     }
 
     @GetMapping
-    public ApiResult getQuestions(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
+    public ApiResult getQuestions(@RequestParam long page, @RequestParam long size, @RequestParam(required = false) String keyword) {
         try {
             return ApiResult.success(questionService.getQuestions(page, size, keyword));
         } catch (Exception e) {

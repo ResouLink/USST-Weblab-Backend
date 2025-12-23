@@ -62,7 +62,7 @@ public class CourseController {
     }
 
     @GetMapping
-    public ApiResult getCourses(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
+    public ApiResult getCourses(@RequestParam long page, @RequestParam long size, @RequestParam(required = false) String keyword) {
         try {
             return ApiResult.success(courseService.getCourses(page, size, keyword));
         } catch (Exception e) {

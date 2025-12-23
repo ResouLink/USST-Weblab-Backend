@@ -49,7 +49,7 @@ public class UserController {
         return ApiResult.success(userService.getUserById(id));
     }
     @GetMapping
-    public ApiResult getUsers(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
+    public ApiResult getUsers(@RequestParam long page, @RequestParam long size, @RequestParam(required = false) String keyword) {
         return ApiResult.success(userService.getUsers(page, size, keyword));
     }
 }

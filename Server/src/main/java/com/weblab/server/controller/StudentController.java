@@ -71,7 +71,7 @@ public class StudentController {
     }
 
     @GetMapping()
-    public ApiResult getStudents(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
+    public ApiResult getStudents(@RequestParam long page, @RequestParam long size, @RequestParam(required = false) String keyword) {
         try {
             return ApiResult.success(studentService.getStudents(page, size, keyword));
         } catch (Exception e) {

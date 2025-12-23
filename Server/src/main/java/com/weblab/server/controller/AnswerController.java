@@ -61,7 +61,7 @@ public class AnswerController {
     }
 
     @GetMapping
-    public ApiResult getAnswers(@RequestParam long page, @RequestParam long size, @RequestParam String keyword) {
+    public ApiResult getAnswers(@RequestParam long page, @RequestParam long size, @RequestParam(required = false) String keyword) {
         try {
             return ApiResult.success(answerService.getAnswers(page, size, keyword));
         } catch (Exception e) {
