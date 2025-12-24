@@ -55,8 +55,11 @@ public class ResourceServiceImpl implements ResourceService {
         existing.setId(id);
 
         boolean updated = resourceDao.updateById(existing);
-        fileListDao.deleteAllResourceFileList(id);
-        fileListDao.addResourceFileList(resourceDTO.getFiles(),id);
+        //关于什么时候管理删除文件有待商榷
+        if(!RoleEnum.ADMIN.value().equals(SecurityUtil.getRole())) {
+            fileListDao.deleteAllResourceFileList(id);
+            fileListDao.addResourceFileList(resourceDTO.getFiles(), id);
+        }
         if (!updated) {
             log.warn("资源更新失败");
             throw new RuntimeException("更新失败");
