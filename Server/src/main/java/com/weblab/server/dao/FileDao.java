@@ -10,6 +10,9 @@ import java.util.List;
 @Service
 public class FileDao extends ServiceImpl<FileMapper, File> {
     public List<String> getFileUrls(List<Long> fileIds) {
+        if(fileIds.isEmpty()) {
+            return List.of();
+        }
         return this.lambdaQuery()
                 .in(File::getId, fileIds)
                 .list()

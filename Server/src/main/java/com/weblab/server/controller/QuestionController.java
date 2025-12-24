@@ -91,6 +91,9 @@ public class QuestionController {
     @GetMapping("/students/{student_id}")
     public ApiResult getQuestionsOfStutents(@PathVariable("student_id") long studentId) {
         try {
+            if(studentId == -1) {
+                studentId = SecurityUtil.getLoginUser().getUser().getRoleId();
+            }
             return ApiResult.success(questionService.getQuestionsRaisedByStudentId(studentId));
         } catch (Exception e) {
             log.info("学生查询自己提问的问题失败",e);

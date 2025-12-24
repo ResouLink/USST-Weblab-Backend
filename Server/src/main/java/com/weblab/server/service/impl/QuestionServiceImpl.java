@@ -2,11 +2,13 @@ package com.weblab.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.weblab.common.enums.RoleEnum;
 import com.weblab.server.dao.*;
 import com.weblab.server.dto.QuestionDTO;
 import com.weblab.server.entity.*;
 import com.weblab.server.event.NotificationEvent;
 import com.weblab.server.event.NotificationType;
+import com.weblab.server.security.SecurityUtil;
 import com.weblab.server.service.NotificationService;
 import com.weblab.server.service.QuestionService;
 import com.weblab.server.vo.QuestionVO;
@@ -66,7 +68,7 @@ public class QuestionServiceImpl implements QuestionService {
         existing.setId(id);
         boolean updated = questionDao.updateById(existing);
 
-        if (updated) {
+        if (updated && !RoleEnum.ADMIN.value().equals(SecurityUtil.getRole())) {
             //删除之前的记录
             fileListDao.deleteAllQuestionFileList(existing.getId());
             //添加新的fileList记录
