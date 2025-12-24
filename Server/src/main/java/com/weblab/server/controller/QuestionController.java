@@ -1,7 +1,9 @@
 package com.weblab.server.controller;
 
+import com.weblab.common.enums.RoleEnum;
 import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.QuestionDTO;
+import com.weblab.server.security.SecurityUtil;
 import com.weblab.server.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,9 @@ public class QuestionController {
     @PostMapping
     public ApiResult addQuestion(@RequestBody QuestionDTO questionDTO) {
         try {
+            if(RoleEnum.STUDENT.value().equals(SecurityUtil.getRole())) {
+                questionDTO.setStudentId(SecurityUtil.getLoginUser().getUser().getRoleId());
+            }
             questionService.addQuestion(questionDTO);
             log.info("问题添加成功");
             return ApiResult.success("添加问题成功");
