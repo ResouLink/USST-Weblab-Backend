@@ -83,6 +83,9 @@ public class StudentController {
     @PostMapping("/{student_id}/courses/{course_id}")
     public ApiResult addStudentCourse(@PathVariable("student_id") long studentId, @PathVariable("course_id") long courseId) {
         try {
+            if(studentId == -1) {
+                studentId = SecurityUtil.getLoginUser().getUser().getRoleId();
+            }
             studentService.addStudentCourse(studentId, courseId);
             log.info("学生课程关系添加成功");
             return ApiResult.success("添加成功", 1);
@@ -95,6 +98,9 @@ public class StudentController {
     @DeleteMapping("/{student_id}/courses/{course_id}")
     public ApiResult deleteStudentCourse(@PathVariable("student_id") long studentId, @PathVariable("course_id") long courseId) {
         try {
+            if(studentId == -1) {
+                studentId = SecurityUtil.getLoginUser().getUser().getRoleId();
+            }
             studentService.deleteStudentCourse(studentId, courseId);
             log.info("学生课程关系删除成功");
             return ApiResult.success("删除成功", 1);
@@ -107,6 +113,9 @@ public class StudentController {
     @GetMapping("/{id}/courses")
     public ApiResult getStudentCourses(@PathVariable("id") long studentId) {
         try {
+            if(studentId == -1) {
+                studentId = SecurityUtil.getLoginUser().getUser().getRoleId();
+            }
             return ApiResult.success(studentService.getStudentCourses(studentId));
         } catch (Exception e) {
             log.error("获取学生课程列表失败", e);
