@@ -1,7 +1,9 @@
 package com.weblab.server.controller;
 
+import com.weblab.common.enums.RoleEnum;
 import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.AnswerDTO;
+import com.weblab.server.security.SecurityUtil;
 import com.weblab.server.service.AnswerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,9 @@ public class AnswerController {
     @PostMapping
     public ApiResult addAnswer(@RequestBody AnswerDTO answerDTO) {
         try {
+            if(RoleEnum.TEACHER.value().equals(SecurityUtil.getRole())) {
+                answerDTO.setTeacherId(SecurityUtil.getLoginUser().getUser().getRoleId());
+            }
             answerService.addAnswer(answerDTO);
             log.info("答案添加成功");
             return ApiResult.success("添加答案成功");
