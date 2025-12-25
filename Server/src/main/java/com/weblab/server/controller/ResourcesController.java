@@ -2,6 +2,7 @@ package com.weblab.server.controller;
 
 import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.ResourceDTO;
+import com.weblab.server.security.SecurityUtil;
 import com.weblab.server.service.ResourceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,9 @@ public class ResourcesController {
     @PostMapping
     public ApiResult addResource(@RequestBody ResourceDTO resourceDTO) {
         try {
+            if(resourceDTO.getUploaderId() == -1) {
+                resourceDTO.setUploaderId(SecurityUtil.getLoginUser().getUser().getRoleId());
+            }
             resourceService.addResource(resourceDTO);
             log.info("资源添加成功");
             return ApiResult.success("添加资源成功");
@@ -29,6 +33,9 @@ public class ResourcesController {
     @PutMapping("/{id}")
     public ApiResult updateResource(@PathVariable long id, @RequestBody ResourceDTO resourceDTO) {
         try {
+            if(resourceDTO.getUploaderId() == -1) {
+                resourceDTO.setUploaderId(SecurityUtil.getLoginUser().getUser().getRoleId());
+            }
             resourceService.updateResource(resourceDTO, id);
             log.info("资源更新成功");
             return ApiResult.success("资源更新成功", 1);
