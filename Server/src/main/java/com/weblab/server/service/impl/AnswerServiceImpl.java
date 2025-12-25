@@ -56,7 +56,7 @@ public class AnswerServiceImpl implements AnswerService {
         }
         //添加回答成功应该将对应的问题的已回答标记打上
         questionDao.update(null, new LambdaUpdateWrapper<Question>()
-                .eq(Question::getId, newAnswer.getId())
+                .eq(Question::getId, answerDTO.getQuestionId())
                 .set(Question::getIsAnswered, 1));
 
         log.info("答案添加成功");
