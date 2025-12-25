@@ -1,5 +1,6 @@
 package com.weblab.server.controller;
 
+import com.weblab.common.enums.RoleEnum;
 import com.weblab.common.result.ApiResult;
 import com.weblab.server.dto.ResourceDTO;
 import com.weblab.server.security.SecurityUtil;
@@ -95,6 +96,57 @@ public class ResourcesController {
             return ApiResult.success("资源下载次数+1成功");
         } catch (Exception e) {
             log.error("资源下载次数+1失败",e);
+            return ApiResult.fail(e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/teachers/{teacherId}")
+    public ApiResult getResourcesByTeacherId(@PathVariable long teacherId) {
+        try {
+            Long currentRoleId = SecurityUtil.getLoginUser().getUser().getRoleId();
+            String role = SecurityUtil.getRole();
+            if (teacherId == -1) {
+                teacherId = currentRoleId;
+            }
+            if (RoleEnum.ADMIN.value().equals(role)) {
+                return ApiResult.success(resourceService.getResourcesByTeacherId(teacherId));
+            }
+            if (RoleEnum.TEACHER.value().equals(role)) {
+                if (!currentRoleId.equals(teacherId)) {
+                    return ApiResult.fail("只能查询自己的资源");
+                }
+                return ApiResult.success(resourceService.getResourcesByTeacherId(teacherId));
+            }
+            return ApiResult.fail("无权限访问");
+        } catch (Exception e) {
+            log.error("教师查询资源失败", e);
+            return ApiResult.fail("查询失败");
+        }
+    }
+
+
+    @GetMapping("/students/{studentId}")
+    public ApiResult getResourcesByStudentId(@PathVariable long studentId) {
+        try {
+            Long currentRoleId = SecurityUtil.getLoginUser().getUser().getRoleId();
+            String role = SecurityUtil.getRole();
+            if(studentId == -1) {
+                studentId = SecurityUtil.getLoginUser().getUser().getRoleId();
+            }
+            if(RoleEnum.ADMIN.value().equals(role)) {
+                return ApiResult.success(resourceService.getResourcesByStudentId(studentId));
+            }
+            if(RoleEnum.STUDENT.value().equals(role)) {
+                if(!currentRoleId.equals(studentId)) {
+                    return ApiResult.fail("只能查询自己的资源");
+                }
+                return ApiResult.success(resourceService.getResourcesByStudentId(studentId));
+            }
+
+            return ApiResult.fail("无权限访问");
+        } catch (Exception e) {
+            log.error("教师查询自己的资源失败",e);
             return ApiResult.fail(e.getMessage());
         }
     }

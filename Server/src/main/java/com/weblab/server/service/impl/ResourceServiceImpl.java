@@ -1,5 +1,6 @@
 package com.weblab.server.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -153,6 +154,58 @@ public class ResourceServiceImpl implements ResourceService {
                         .setSql("download_count = download_count + 1")
                         .eq("id", id)
         );
+    }
+
+    /**
+     * @param teacherId
+     * @return
+     */
+    @Override
+    public List<ResourceVO> getResourcesByTeacherId(long teacherId) {
+        LambdaQueryWrapper<Resource> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Resource::getUploaderId, teacherId)
+                .eq(Resource::getUploaderRole, RoleEnum.TEACHER.value());
+
+        queryWrapper.ne(Resource::getVisibility, 3); // 排除管理员隐藏的资源
+         List<Resource> resources = resourceDao.list(queryWrapper);
+
+         if (!resources.isEmpty()) {
+             return resources.stream().map(resource -> {
+                 List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.RESOURCE, resource.getId());
+                 List<String> fileUrls = fileDao.getFileUrls(fileIds);
+
+                 ResourceVO vo = new ResourceVO();
+                 BeanUtils.copyProperties(resource, vo);
+                 vo.setFileUrls(fileUrls);
+                 return vo;
+             }).collect(Collectors.toList());
+         }
+        return List.of();
+    }
+
+    /**
+     * @param studentId
+     * @return
+     */
+    @Override
+    public List<ResourceVO> getResourcesByStudentId(long studentId) {
+        LambdaQueryWrapper<Resource> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Resource::getUploaderId, studentId)
+                .eq(Resource::getUploaderRole, RoleEnum.STUDENT.value());
+        queryWrapper.ne(Resource::getVisibility, 3); // 排除管理员隐藏的资源
+        List<Resource> resources = resourceDao.list(queryWrapper);
+        if (!resources.isEmpty()) {
+            return resources.stream().map(resource -> {
+                List<Long> fileIds = fileListDao.getFileIds(FileRoleEnum.RESOURCE, resource.getId());
+                List<String> fileUrls = fileDao.getFileUrls(fileIds);
+
+                ResourceVO vo = new ResourceVO();
+                BeanUtils.copyProperties(resource, vo);
+                vo.setFileUrls(fileUrls);
+                return vo;
+            }).collect(Collectors.toList());
+        }
+        return List.of();
     }
 
 

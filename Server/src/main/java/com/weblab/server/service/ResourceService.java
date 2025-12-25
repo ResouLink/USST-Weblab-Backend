@@ -13,4 +13,7 @@ public interface ResourceService {
     List<ResourceVO> getResources(long page,long size, String keyword);
     List<ResourceVO> getResourcesByCourseId(long courseId);
     void increaseDownloadCnt(long id);
+
+    List<ResourceVO> getResourcesByTeacherId(long teacherId);
+    List<ResourceVO> getResourcesByStudentId(long studentId);
 }
