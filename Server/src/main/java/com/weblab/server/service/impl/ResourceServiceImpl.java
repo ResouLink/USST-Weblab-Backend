@@ -164,7 +164,7 @@ public class ResourceServiceImpl implements ResourceService {
     public List<ResourceVO> getResourcesByTeacherId(long teacherId) {
         LambdaQueryWrapper<Resource> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Resource::getUploaderId, teacherId)
-                .eq(Resource::getUploaderRole, RoleEnum.TEACHER.value());
+                .eq(Resource::getUploaderRole, RoleEnum.TEACHER.num());
 
         queryWrapper.ne(Resource::getVisibility, 3); // 排除管理员隐藏的资源
          List<Resource> resources = resourceDao.list(queryWrapper);
@@ -191,7 +191,7 @@ public class ResourceServiceImpl implements ResourceService {
     public List<ResourceVO> getResourcesByStudentId(long studentId) {
         LambdaQueryWrapper<Resource> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Resource::getUploaderId, studentId)
-                .eq(Resource::getUploaderRole, RoleEnum.STUDENT.value());
+                .eq(Resource::getUploaderRole, RoleEnum.STUDENT.num());
         queryWrapper.ne(Resource::getVisibility, 3); // 排除管理员隐藏的资源
         List<Resource> resources = resourceDao.list(queryWrapper);
         if (!resources.isEmpty()) {
