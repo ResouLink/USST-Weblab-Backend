@@ -82,6 +82,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/students").permitAll()
                         // 登录 & 注册接口
                         .requestMatchers("/api/login").permitAll()
+                        // SSE 连接接口
+                        .requestMatchers("/api/sse/connect").permitAll()
 
                         // 业务接口必须登录
                         .requestMatchers("/api/**").authenticated()

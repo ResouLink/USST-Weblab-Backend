@@ -2,6 +2,7 @@ package com.weblab.server.controller;
 
 import com.weblab.common.result.ApiResult;
 import com.weblab.server.entity.Notification;
+import com.weblab.server.entity.Users;
 import com.weblab.server.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class NotificationController {
     @GetMapping("/unread/count")
     public ApiResult getUnreadCount() {
         try {
-            Long userId = getCurrentUserId();
+            long userId = getCurrentUserId();
             long count = notificationService.getUnreadCount(userId);
             log.info("用户{}未读通知数: {}", userId, count);
             return ApiResult.success(count);
@@ -88,7 +89,7 @@ public class NotificationController {
     /**
      * 获取当前登录用户的ID
      */
-    private Long getCurrentUserId() {
+    private long getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("用户未认证");
@@ -96,7 +97,7 @@ public class NotificationController {
         // 从 authentication.getPrincipal() 获取 UserDetails
         Object principal = authentication.getPrincipal();
         if (principal instanceof com.weblab.server.security.LoginUser) {
-            return ((com.weblab.server.security.LoginUser) principal).getUser().getId();
+            return ((com.weblab.server.security.LoginUser) principal).getUser().getRoleId();
         }
         throw new RuntimeException("无法获取用户信息");
     }
