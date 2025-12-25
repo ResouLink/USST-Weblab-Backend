@@ -16,4 +16,8 @@ public interface UserService {
     void deleteUser(long id);
     UserVO getUserById(long id);
     List<UserVO> getUsers(long page, long size, String keyword);
+
+    UserVO getUsersByStudentId(long studentId);
+
+    UserVO getUsersByTeacherId(long teacherId);
 }

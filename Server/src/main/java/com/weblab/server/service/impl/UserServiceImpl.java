@@ -178,4 +178,30 @@ public class UserServiceImpl implements UserService {
         return voList;
     }
 
+    /**
+     * @param studentId
+     * @return
+     */
+    @Override
+    public UserVO getUsersByStudentId(long studentId) {
+        Users user = userDao.lambdaQuery().eq(Users::getUserRole,1L).eq(Users::getRoleId,studentId).one();
+        UserVO vo = new UserVO();
+        BeanUtils.copyProperties(user, vo);
+        vo.setAvatarUrl(fileListDao.getAvatarUrl(user.getId()));
+        return vo;
+    }
+
+    /**
+     * @param teacherId
+     * @return
+     */
+    @Override
+    public UserVO getUsersByTeacherId(long teacherId) {
+        Users user = userDao.lambdaQuery().eq(Users::getUserRole,0L).eq(Users::getRoleId,teacherId).one();
+        UserVO vo = new UserVO();
+        BeanUtils.copyProperties(user, vo);
+        vo.setAvatarUrl(fileListDao.getAvatarUrl(user.getId()));
+        return vo;
+    }
+
 }

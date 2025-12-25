@@ -52,4 +52,13 @@ public class UserController {
     public ApiResult getUsers(@RequestParam long page, @RequestParam long size, @RequestParam(required = false) String keyword) {
         return ApiResult.success(userService.getUsers(page, size, keyword));
     }
+    @GetMapping("/students/{id}")
+    public ApiResult getUsersByStudentId(@PathVariable("id") long studentId) {
+        return ApiResult.success(userService.getUsersByStudentId(studentId));
+    }
+
+    @GetMapping("/teachers/{id}")
+    public ApiResult getUsersByTeacherId(@PathVariable("id") long teacherId) {
+        return ApiResult.success(userService.getUsersByTeacherId(teacherId));
+    }
 }
