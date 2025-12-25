@@ -8,8 +8,6 @@ import com.weblab.server.dao.TeacherCourseDao;
 import com.weblab.server.dao.UserDao;
 import com.weblab.server.entity.Notification;
 import com.weblab.server.entity.Question;
-import com.weblab.server.entity.Users;
-import com.weblab.server.event.SseClient;
 import com.weblab.server.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,6 +112,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * 获取用户的通知列表
+     *
      * @param userId 用户ID
      * @param status 状态：null表示所有，0表示未读，1表示已读
      */

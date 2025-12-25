@@ -1,9 +1,7 @@
 package com.weblab.server.event;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
 import com.weblab.common.exception.ServiceException;
-import com.weblab.server.dao.NotificationDao;
 import com.weblab.server.dao.UserDao;
 import com.weblab.server.entity.Notification;
 import com.weblab.server.entity.Users;
@@ -19,8 +17,6 @@ import java.util.List;
 @Component
 public class NotificationListener implements ApplicationListener<NotificationEvent> {
 
-    @Autowired
-    private NotificationDao notificationDao;
     @Autowired
     private UserDao userDao;
 
@@ -61,7 +57,7 @@ public class NotificationListener implements ApplicationListener<NotificationEve
             if (notificationType == NotificationType.QUESTION) {
                 // 获得老师
                 Long teacherId = notification.getTeacherId();
-                Users user = userDao.query().eq("role_id", StrUtil.toString(teacherId)).eq("user_role", 0).one();
+                Users user = userDao.query().eq("role_id", teacherId).eq("user_role", 0).one();
                 notificationDto.setNotification(notification);
                 notificationDto.setUser(user.getId());
                 return notificationDto;
@@ -69,7 +65,7 @@ public class NotificationListener implements ApplicationListener<NotificationEve
             } else if (notificationType == NotificationType.ANSWER) {
                 // 获得学生
                 long studentId = notification.getStudentId();
-                Users user = userDao.query().eq("role_id", StrUtil.toString(studentId)).eq("user_role", 1).one();
+                Users user = userDao.query().eq("role_id", studentId).eq("user_role", 1).one();
                 notificationDto.setNotification(notification);
                 notificationDto.setUser(user.getId());
                 return notificationDto;

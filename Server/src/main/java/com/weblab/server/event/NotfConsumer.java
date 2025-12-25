@@ -1,8 +1,6 @@
 package com.weblab.server.event;
 
 import cn.hutool.core.util.StrUtil;
-import com.weblab.server.dao.NotificationDao;
-import com.weblab.server.entity.Notification;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -16,9 +14,6 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 @Component
 public class NotfConsumer implements Runnable, DisposableBean {
-
-    @Autowired
-    private NotificationDao notificationDao;
 
     @Autowired
     @Qualifier("notificationExecutor")
@@ -57,10 +52,6 @@ public class NotfConsumer implements Runnable, DisposableBean {
                 if (Boolean.FALSE.equals(isSend)) {
                     continue;
                 }
-                // 通知成功， 设置通知为已通知
-                Notification notification = notificationDto.getNotification();
-//                notification.setStatus(1);
-                notificationDao.updateById(notification);
                 log.info("消息推送成功！");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
