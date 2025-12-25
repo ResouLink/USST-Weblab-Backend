@@ -1,10 +1,7 @@
 package com.weblab.server.event;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -87,7 +84,7 @@ public class SseClient {
 
         final ScheduledFuture<?> future = heartbeatExecutors.scheduleAtFixedRate(new HeartBeatTask(userId), 0, 1, TimeUnit.SECONDS);
         // 注册回调
-        sseEmitter.onCompletion(completionCallBack(userId,  future));
+        sseEmitter.onCompletion(completionCallBack(userId, future));
         sseEmitter.onError(errorCallBack(userId));
         sseEmitter.onTimeout(timeoutCallBack(userId));
 
@@ -119,7 +116,7 @@ public class SseClient {
     }
 
 
-    private static Runnable completionCallBack(String userId, ScheduledFuture<?>  future) {
+    private static Runnable completionCallBack(String userId, ScheduledFuture<?> future) {
         return () -> {
             log.info("结束 sse 连接：{}", userId);
             removeUser(userId);
