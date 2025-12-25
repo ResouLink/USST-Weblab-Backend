@@ -81,6 +81,9 @@ public class QuestionController {
     @GetMapping("/teachers/{teacher_id}")
     public ApiResult getQuestionsToBeAnswered(@PathVariable("teacher_id") long teacherId) {
         try {
+            if(teacherId == -1) {
+                teacherId = SecurityUtil.getLoginUser().getUser().getRoleId();
+            }
             return ApiResult.success(questionService.getQuestionsToBeAnswered(teacherId));
         } catch (Exception e) {
             log.info("查询待回答问题失败",e);
