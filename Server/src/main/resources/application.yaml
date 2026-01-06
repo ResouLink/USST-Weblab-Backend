@@ -13,11 +13,11 @@ server:
 
 weblabedb:
     postgres:
-        host: 124.221.95.132
+        host: 
         port: 5432
-        db: webappdb
-        username: webuser
-        password: web_experiment
+        db: 
+        username: 
+        password:
 
 mybatis-plus:
     configuration:
@@ -28,7 +28,7 @@ mybatis-plus:
 
 alioss:
   endpoint: oss-cn-shanghai.aliyuncs.com
-  access-key-id: LTAI5tAN9c1RzEn9tCh4amtj
-  access-key-secret: ovLOyOeYpEYJXzqjFdJZJpJyhz9x6e
+  access-key-id: 
+  access-key-secret: 
   bucket-name: testbucket-3100157652
 
